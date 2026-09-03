@@ -1,13 +1,310 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500&display=swap" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="style.css">
-        <title>StampDanFan</title>
-    </head>
-    <body>
-        <h1>My Page</h1>
-        <a href="https://scratch.mit.edu/users/StampDanFan/">My Scratch page</a>
-    </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- =====================================================================
+       SEO & META
+       Edit: title, description, og:title, og:description, og:url
+  ====================================================================== -->
+  <title>Clayton Yu · Computational Biology @ CMU · STEM Tutor</title>
+  <meta name="description"
+    content="Clayton Yu is a computational biology student at Carnegie Mellon University and experienced STEM tutor offering personalized instruction in math, science, and computer science." />
+
+  <!-- Open Graph (social sharing preview) -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://YOUR_GITHUB_USERNAME.github.io/" />
+  <meta property="og:title"       content="Clayton Yu · Computational Biology @ CMU · STEM Tutor" />
+  <meta property="og:description" content="Personalized STEM tutoring and academic portfolio of Clayton Yu, Computational Biology student at CMU." />
+  <!-- <meta property="og:image" content="assets/images/og-preview.png" /> -->
+
+  <!-- Favicon — place a favicon.ico or favicon.png in /assets/icons/ -->
+  <!-- <link rel="icon" href="assets/icons/favicon.ico" /> -->
+
+  <!-- Google Fonts — Nunito (approachable professional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+
+  <!-- =====================================================================
+       NAVIGATION
+       To add a new page: copy one <a> element and update href + text.
+       Keep the same structure in portfolio.html and tutoring.html.
+  ====================================================================== -->
+  <nav class="nav" id="main-nav" aria-label="Main navigation">
+    <div class="container nav-inner">
+
+      <!-- Logo / Name — edit Clayton Yu -->
+      <a href="index.html" class="nav-logo">Clayton Yu</a>
+
+      <!-- Desktop links -->
+      <ul class="nav-links" role="list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="tutoring.html">Tutoring</a></li>
+        <!-- FUTURE PAGES: copy a <li><a> here, e.g.:
+        <li><a href="research.html">Research</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        -->
+      </ul>
+
+      <!-- Mobile hamburger button -->
+      <button class="nav-toggle" id="nav-toggle"
+              aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu (hidden by default) -->
+  <nav class="nav-mobile" id="nav-mobile" aria-label="Mobile navigation" aria-hidden="true">
+    <a href="index.html">Home</a>
+    <a href="portfolio.html">Portfolio</a>
+    <a href="tutoring.html">Tutoring</a>
+    <!-- Mirror desktop links above -->
+  </nav>
+
+
+  <!-- =====================================================================
+       HERO SECTION
+       Edit: your name, tagline, subtitle, and call-to-action text.
+  ====================================================================== -->
+  <section class="hero" aria-label="Introduction">
+    <div class="container hero-inner">
+
+      <div class="hero-text">
+        <span class="greeting">Hello, I'm</span>
+
+        <!-- Edit: your full name -->
+        <h1>Clayton Yu</h1>
+
+        <!-- Edit: your tagline badges -->
+        <div class="tagline-badges">
+          <span class="tag">Computational Biology @ CMU</span>
+          <span class="tag">STEM Tutor</span>
+          <span class="tag">Researcher</span>
+        </div>
+
+        <!-- Edit: your hero subtitle -->
+        <p class="subtitle">
+          I bridge rigorous academic research and personalized teaching —
+          helping students master STEM subjects while pursuing my own work
+          in computational biology at Carnegie Mellon.
+        </p>
+
+        <div class="hero-cta">
+          <a href="portfolio.html" class="btn btn-primary btn-lg">View Portfolio</a>
+          <a href="tutoring.html" class="btn btn-secondary btn-lg">Explore Tutoring</a>
+          <a href="tutoring.html#inquiry" class="btn btn-outline-accent btn-lg">Contact Me</a>
+        </div>
+      </div>
+
+      <!-- Headshot placeholder.
+           TO ADD YOUR PHOTO:
+           1. Save your image as assets/images/headshot.jpg
+           2. Replace the entire <div class="headshot-placeholder"> block with:
+              <img src="assets/images/headshot.jpg"
+                   alt="Clayton Yu headshot"
+                   class="headshot-img"
+                   width="280" height="280" />
+           3. Add to CSS: .headshot-img { width:280px; height:280px;
+              border-radius:50%; object-fit:cover; box-shadow: var(--shadow-lg); }
+      -->
+      <div class="hero-image" aria-hidden="true">
+        <div class="headshot-placeholder">
+          <span class="avatar-icon" aria-hidden="true">👤</span>
+          <span class="avatar-label">Add Your<br>Photo Here</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- =====================================================================
+       PROFESSIONAL INTRODUCTION
+       Edit: the paragraph text to reflect your actual background.
+  ====================================================================== -->
+  <section class="section" aria-labelledby="intro-heading">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">About Me</span>
+        <div class="divider"></div>
+        <h2 id="intro-heading">Researcher, Educator, Problem-Solver</h2>
+        <p>
+          A brief introduction to who I am, what I study, and what drives my
+          teaching. Edit this paragraph to reflect your authentic background.
+        </p>
+      </div>
+
+      <div class="grid-2 reveal">
+        <!-- Edit: left column — academic background -->
+        <div>
+          <h3>Academic Background</h3>
+          <div class="divider"></div>
+          <p>
+            I am a student of Computational Biology at Carnegie Mellon University,
+            where I combine quantitative methods with biological questions.
+            My coursework spans machine learning, bioinformatics, statistics,
+            and molecular biology — equipping me with a uniquely cross-disciplinary
+            perspective.
+          </p>
+          <p>
+            <!-- Edit: research interests -->
+            My research interests include [YOUR RESEARCH INTERESTS], and I am
+            actively involved in [LAB/PROJECT NAME] under [ADVISOR NAME].
+          </p>
+        </div>
+
+        <!-- Edit: right column — teaching -->
+        <div>
+          <h3>Teaching &amp; Tutoring</h3>
+          <div class="divider"></div>
+          <p>
+            I have tutored students ranging from middle school to introductory
+            college coursework, specializing in mathematics, the sciences, and
+            computer science. I believe every student can succeed with the right
+            support, patience, and a clear explanation tailored to how they think.
+          </p>
+          <p>
+            <!-- Edit: teaching philosophy highlight -->
+            My approach focuses on building genuine understanding rather than
+            memorization — so students can tackle problems they've never seen before.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================================================================
+       FEATURED HIGHLIGHTS — cards showcasing key areas
+       Edit: icon, title, and description for each card.
+       To add a card: copy one <div class="card reveal"> block.
+  ====================================================================== -->
+  <section class="section section-alt" aria-labelledby="highlights-heading">
+    <div class="container">
+      <div class="section-header centered">
+        <span class="section-label">What I Offer</span>
+        <div class="divider centered"></div>
+        <h2 id="highlights-heading">Featured Highlights</h2>
+      </div>
+
+      <div class="grid-3">
+
+        <div class="card reveal">
+          <span class="card-icon" aria-hidden="true">🧬</span>
+          <h3>Computational Biology Research</h3>
+          <p class="text-muted">
+            Active researcher applying machine learning and bioinformatics to
+            biological datasets — bringing real scientific thinking to every tutoring session.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <span class="card-icon" aria-hidden="true">📐</span>
+          <h3>STEM Tutoring</h3>
+          <p class="text-muted">
+            Personalized instruction in math (Pre-Algebra through Calculus),
+            science (Bio, Chem, Physics), and CS — from middle school through
+            introductory college courses.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <span class="card-icon" aria-hidden="true">🎯</span>
+          <h3>Test &amp; Exam Prep</h3>
+          <p class="text-muted">
+            Strategic preparation for AP exams, standardized tests, and college
+            coursework — focused on understanding concepts, not just drilling answers.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <span class="card-icon" aria-hidden="true">💻</span>
+          <h3>Programming &amp; CS</h3>
+          <p class="text-muted">
+            Instruction in Python, Java, introductory data science, and
+            computational thinking — from first programs to more complex projects.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <span class="card-icon" aria-hidden="true">📚</span>
+          <h3>Study Skills &amp; Mentorship</h3>
+          <p class="text-muted">
+            Beyond content: helping students build time management, note-taking,
+            and problem-solving habits that serve them for life.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <span class="card-icon" aria-hidden="true">🏆</span>
+          <h3>Academic Achievement</h3>
+          <p class="text-muted">
+            <!-- Edit: replace with your actual achievement highlight -->
+            [AWARD / SCHOLARSHIP / HONOR] — recognition that reflects my
+            commitment to rigorous academics and continuous growth.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================================================================
+       QUICK-LINKS / DUAL CTA
+  ====================================================================== -->
+  <section class="section" aria-label="Navigation prompts">
+    <div class="container text-center">
+      <span class="section-label">Where to Next?</span>
+      <div class="divider centered"></div>
+      <h2 style="margin-bottom: var(--space-4);">Explore My Work or Start Learning</h2>
+      <p class="text-muted" style="max-width:55ch; margin-inline:auto; margin-bottom:var(--space-8);">
+        Whether you're a parent researching a tutor, a professor reviewing my
+        background, or a student ready to get started — there's a place for you here.
+      </p>
+      <div style="display:flex; gap:var(--space-4); justify-content:center; flex-wrap:wrap;">
+        <a href="portfolio.html" class="btn btn-secondary btn-lg">View My Portfolio →</a>
+        <a href="tutoring.html" class="btn btn-primary btn-lg">Tutoring Services →</a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================================================================
+       FOOTER
+       Edit: Clayton Yu, links, and contact handles.
+       Mirror this footer in portfolio.html and tutoring.html.
+  ====================================================================== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container footer-inner">
+      <span class="footer-brand">Clayton Yu</span>
+
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="tutoring.html">Tutoring</a>
+      </nav>
+
+      <span class="footer-copy">
+        &copy; <span id="year"></span> Clayton Yu. All rights reserved.
+      </span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    // Auto-update copyright year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
 </html>

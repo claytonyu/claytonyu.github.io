@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Portfolio — Clayton Yu</title>
+  <meta name="description"
+    content="Academic portfolio and résumé of Clayton Yu — Computational Biology student at CMU, researcher, and STEM educator." />
+
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://YOUR_GITHUB_USERNAME.github.io/portfolio.html" />
+  <meta property="og:title"       content="Portfolio — Clayton Yu" />
+  <meta property="og:description" content="Academic portfolio and résumé of Clayton Yu." />
+
+  <!-- <link rel="icon" href="assets/icons/favicon.ico" /> -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+
+  <!-- NAVIGATION — keep identical across all pages -->
+  <nav class="nav" id="main-nav" aria-label="Main navigation">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">Clayton Yu</a>
+      <ul class="nav-links" role="list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="tutoring.html">Tutoring</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle"
+              aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <nav class="nav-mobile" id="nav-mobile" aria-label="Mobile navigation" aria-hidden="true">
+    <a href="index.html">Home</a>
+    <a href="portfolio.html">Portfolio</a>
+    <a href="tutoring.html">Tutoring</a>
+  </nav>
+
+
+  <!-- PAGE HERO -->
+  <header class="page-hero" aria-label="Portfolio header">
+    <div class="container">
+      <span class="section-label" style="color:rgba(255,255,255,0.6);">Academic &amp; Professional</span>
+      <h1>Portfolio &amp; Résumé</h1>
+      <p>
+        An overview of my education, research, teaching experience,
+        technical skills, and academic achievements.
+      </p>
+    </div>
+  </header>
+
+
+  <!-- =====================================================================
+       MAIN CONTENT — Portfolio sections
+  ====================================================================== -->
+  <main>
+    <div class="container" style="max-width: 820px;">
+
+
+      <!-- -----------------------------------------------------------------
+           PROFESSIONAL SUMMARY
+           Edit: this paragraph to reflect your actual background.
+      ------------------------------------------------------------------ -->
+      <div class="resume-section reveal" aria-labelledby="summary-heading">
+        <span class="section-label">Overview</span>
+        <div class="divider"></div>
+        <h2 id="summary-heading">Professional Summary</h2>
+        <p>
+          I am a Computational Biology student at Carnegie Mellon University with
+          a strong foundation in quantitative methods, programming, and the life
+          sciences. My academic work focuses on [YOUR RESEARCH FOCUS], and I
+          bring this analytical mindset into my tutoring practice — helping
+          students in mathematics, science, and computer science develop genuine
+          conceptual mastery.
+        </p>
+        <p>
+          I am actively seeking [research opportunities / graduate programs /
+          internships] in [your target fields]. I am available for tutoring
+          both online and in the [Pittsburgh / YOUR AREA] area.
+        </p>
+        <div style="margin-top:var(--space-5);">
+          <a href="tutoring.html#inquiry" class="btn btn-primary">Hire Me as a Tutor</a>
+          &nbsp;
+          <a href="mailto:YOUR_EMAIL@example.com" class="btn btn-secondary">Get in Touch</a>
+        </div>
+      </div>
+
+
+      <!-- -----------------------------------------------------------------
+           EDUCATION
+           To add an entry: copy one <div class="entry"> block.
+           Fields: institution, degree, date, GPA (optional), notes.
+      ------------------------------------------------------------------ -->
+      <div class="resume-section reveal" aria-labelledby="education-heading">
+        <span class="section-label">Education</span>
+        <div class="divider"></div>
+        <h2 id="education-heading">Education</h2>
+
+        <!-- Entry 1 -->
+        <div class="entry">
+          <div>
+            <div class="entry-title">Carnegie Mellon University</div>
+            <div class="entry-subtitle">
+              B.S. in Computational Biology
+              <!-- Edit: add honors if applicable, e.g. "· University Honors" -->
+            </div>
+            <div class="entry-desc">
+              <p>
+                <!-- Edit: GPA (optional), relevant coursework, thesis -->
+                GPA: [X.XX / 4.00] &nbsp;·&nbsp; Expected Graduation: [Month Year]
+              </p>
+              <p><strong>Relevant Coursework:</strong>
+                Computational Genomics, Machine Learning, Biostatistics,
+                Linear Algebra, Differential Equations, Molecular Biology,
+                Algorithms, Data Structures
+              </p>
+            </div>
+          </div>
+          <div class="entry-date">[Year] – Present</div>
+        </div>
+
+        <!-- Entry 2 (High School — remove if not desired) -->
+        <div class="entry">
+          <div>
+            <div class="entry-title">YOUR HIGH SCHOOL NAME</div>
+            <div class="entry-subtitle">High School Diploma</div>
+            <div class="entry-desc">
+              <p>
+                GPA: [X.XX] &nbsp;·&nbsp; Graduated [Year]
+              </p>
+              <p>
+                <!-- Edit: honors, clubs, AP courses -->
+                Honors/AP coursework: AP Biology, AP Chemistry, AP Calculus BC,
+                AP Computer Science A, AP Statistics
+              </p>
+            </div>
+          </div>
+          <div class="entry-date">Graduated [Year]</div>
+        </div>
+
+      </div>
+
+
+      <!-- -----------------------------------------------------------------
+           RESEARCH EXPERIENCE
+           To add an entry: copy one <div class="entry"> block.
+      ------------------------------------------------------------------ -->
+      <div class="resume-section reveal" aria-labelledby="research-heading">
+        <span class="section-label">Research</span>
+        <div class="divider"></div>
+        <h2 id="research-heading">Research Experience</h2>
+
+        <div class="entry">
+          <div>
+            <div class="entry-title">YOUR LAB / PROJECT NAME</div>
+            <div class="entry-subtitle">Undergraduate Researcher &nbsp;·&nbsp; [Institution]</div>
+            <div class="entry-desc">
+              <ul>
+                <li>Describe your research contribution, method, or finding here.</li>
+                <li>Use action verbs: Developed, Analyzed, Built, Investigated, Applied.</li>
+                <li>Mention tools or techniques: Python, R, scRNA-seq, BLAST, ML pipelines.</li>
+                <li>
+                  <!-- Edit: add publication/poster if applicable -->
+                  Presented findings at [conference/lab meeting]; paper in preparation.
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="entry-date">[Month Year] –<br>Present</div>
+        </div>
+
+        <!-- Add more research entries here -->
+
+      </div>
+
+
+      <!-- -----------------------------------------------------------------
+           TEACHING EXPERIENCE
+           To add an entry: copy one <div class="entry"> block.
+      ------------------------------------------------------------------ -->
+      <div class="resume-section reveal" aria-labelledby="teaching-heading">
+        <span class="section-label">Teaching</span>
+        <div class="divider"></div>
+        <h2 id="teaching-heading">Teaching Experience</h2>
+
+        <div class="entry">
+          <div>
+            <div class="entry-title">Independent STEM Tutor</div>
+            <div class="entry-subtitle">Self-Employed &nbsp;·&nbsp; Online &amp; In-Person</div>
+            <div class="entry-desc">
+              <ul>
+                <li>
+                  Provide personalized tutoring in mathematics, science, and
+                  computer science to middle school, high school, and college students.
+                </li>
+                <li>
+                  Subjects include Pre-Algebra through Calculus, Biology, Chemistry,
+                  Physics, Python, Java, and AP exam preparation.
+                </li>
+                <li>
+                  Develop customized lesson plans, practice problems, and study
+                  strategies tailored to each student's learning style and goals.
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="entry-date">[Year] –<br>Present</div>
+        </div>
+
+        <!-- Example: Teaching Assistantship (edit or remove) -->
+        <div class="entry">
+          <div>
+            <div class="entry-title">Teaching Assistant — [Course Name]</div>
+            <div class="entry-subtitle">[University / Department]</div>
+            <div class="entry-desc">
+              <ul>
+                <li>Held weekly office hours for [N] students enrolled in [Course].</li>
+                <li>Graded assignments and provided written feedback.</li>
+                <li>Led recitation sections covering [topics].</li>
+              </ul>
+            </div>
+          </div>
+          <div class="entry-date">[Semester Year]</div>
+        </div>
+
+      </div>
+
+
+      <!-- -----------------------------------------------------------------
+           TECHNICAL SKILLS
+           To add a skill: append a <span class="tag"> inside a category.
+           To add a category: copy one <div> group.
+      ------------------------------------------------------------------ -->
+      <div class="resume-section reveal" aria-labelledby="skills-heading">
+        <span class="section-label">Skills</span>
+        <div class="divider"></div>
+        <h2 id="skills-heading">Technical Skills</h2>
+
+        <div style="display:flex; flex-direction:column; gap:var(--space-5); margin-top:var(--space-4);">
+
+          <div>
+            <h4 style="margin-bottom:var(--space-2);">Programming Languages</h4>
+            <div class="skills-grid">
+              <span class="tag">Python</span>
+              <span class="tag">R</span>
+              <span class="tag">Java</span>
+              <span class="tag">MATLAB</span>
+              <span class="tag">Bash</span>
+              <!-- Add more here -->
+            </div>
+          </div>
+
+          <div>
+            <h4 style="margin-bottom:var(--space-2);">Bioinformatics &amp; Computational Biology</h4>
+            <div class="skills-grid">
+              <span class="tag">NumPy / pandas</span>
+              <span class="tag">scikit-learn</span>
+              <span class="tag">Biopython</span>
+              <span class="tag">scRNA-seq</span>
+              <span class="tag">BLAST</span>
+              <span class="tag">UNIX / HPC</span>
+              <!-- Add more here -->
+            </div>
+          </div>
+
+          <div>
+            <h4 style="margin-bottom:var(--space-2);">Mathematics &amp; Statistics</h4>
+            <div class="skills-grid">
+              <span class="tag">Linear Algebra</span>
+              <span class="tag">Differential Equations</span>
+              <span class="tag">Probability Theory</span>
+              <span class="tag">Statistical Inference</span>
+              <span class="tag">Calculus</span>
+              <!-- Add more here -->
+            </div>
+          </div>
+
+          <div>
+            <h4 style="margin-bottom:var(--space-2);">Laboratory &amp; Wet Lab</h4>
+            <div class="skills-grid">
+              <span class="tag">PCR</span>
+              <span class="tag">Gel Electrophoresis</span>
+              <span class="tag">Pipetting</span>
+              <!-- Edit or remove if not applicable -->
+            </div>
+          </div>
+
+          <div>
+            <h4 style="margin-bottom:var(--space-2);">Tools &amp; Platforms</h4>
+            <div class="skills-grid">
+              <span class="tag">Git / GitHub</span>
+              <span class="tag">VS Code</span>
+              <span class="tag">Jupyter</span>
+              <span class="tag">LaTeX</span>
+              <span class="tag">Google Workspace</span>
+              <!-- Add more here -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- -----------------------------------------------------------------
+           ACADEMIC ACHIEVEMENTS
+           To add: copy one <div class="entry"> block.
+      ------------------------------------------------------------------ -->
+      <div class="resume-section reveal" aria-labelledby="achievements-heading">
+        <span class="section-label">Recognition</span>
+        <div class="divider"></div>
+        <h2 id="achievements-heading">Academic Achievements</h2>
+
+        <div class="entry">
+          <div>
+            <div class="entry-title">[Award / Scholarship Name]</div>
+            <div class="entry-subtitle">[Awarding Organization]</div>
+            <div class="entry-desc">
+              <p>Brief description of the award and why it was received.</p>
+            </div>
+          </div>
+          <div class="entry-date">[Year]</div>
+        </div>
+
+        <div class="entry">
+          <div>
+            <div class="entry-title">[Honor / Fellowship Name]</div>
+            <div class="entry-subtitle">[Awarding Organization]</div>
+            <div class="entry-desc">
+              <p>Brief description.</p>
+            </div>
+          </div>
+          <div class="entry-date">[Year]</div>
+        </div>
+
+        <!-- Add more entries here -->
+
+      </div>
+
+
+      <!-- -----------------------------------------------------------------
+           RESUME DOWNLOAD
+           HOW TO ADD YOUR PDF:
+           1. Save your resume as: assets/documents/resume.pdf
+           2. The download button below will link directly to it.
+           3. To update: simply replace the file with the same name.
+              GitHub Pages will serve the new version automatically.
+      ------------------------------------------------------------------ -->
+      <div class="resume-section reveal">
+        <div class="resume-download" aria-label="Download resume">
+          <span style="font-size:2.5rem;" aria-hidden="true">📄</span>
+          <h3>Download My Résumé</h3>
+          <p class="text-muted" style="max-width:45ch; text-align:center;">
+            A full one-page PDF résumé is available for download.
+            Last updated: <strong>[Month Year]</strong>
+            <!-- Edit: update the date whenever you replace the PDF -->
+          </p>
+          <!-- TO ENABLE: remove the "disabled" attribute and set href below -->
+          <a href="assets/documents/resume.pdf"
+             download="Clayton Yu_Resume.pdf"
+             class="btn btn-primary btn-lg"
+             aria-label="Download résumé PDF">
+            ⬇ Download PDF Résumé
+          </a>
+          <p class="text-muted" style="font-size:var(--text-xs);">
+            File not available yet?
+            <a href="mailto:YOUR_EMAIL@example.com">Email me directly</a> for a copy.
+          </p>
+        </div>
+      </div>
+
+
+    </div><!-- /container -->
+  </main>
+
+
+  <!-- FOOTER — mirror across all pages -->
+  <footer class="footer" role="contentinfo">
+    <div class="container footer-inner">
+      <span class="footer-brand">Clayton Yu</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="tutoring.html">Tutoring</a>
+      </nav>
+      <span class="footer-copy">
+        &copy; <span id="year"></span> Clayton Yu. All rights reserved.
+      </span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+</body>
+</html>
