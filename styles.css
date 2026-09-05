@@ -784,7 +784,7 @@ body.modal-open {
 }
 
 .cell-organelle.is-active {
-  filter: drop-shadow(0 0 10px rgba(143, 72, 36, 0.28));
+  filter: drop-shadow(0 0 20px rgba(38, 19, 10, 0.5));
 }
 
 /* ---------- Dogleg leader overlay ---------- */
@@ -801,7 +801,7 @@ body.modal-open {
 .cell-leader-line {
   fill: none;
   stroke: #9a887b;
-  stroke-width: 1.8;
+  stroke-width: 5;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
@@ -815,7 +815,7 @@ body.modal-open {
 
 .cell-leader-line.is-active {
   stroke: var(--color-accent-dark);
-  stroke-width: 2.6;
+  stroke-width: 8;
 }
 
 .cell-leader-dot.is-active {
@@ -838,9 +838,8 @@ body.modal-open {
   align-items: center;
   min-height: 168px;
   padding: clamp(1.3rem, 3vw, 1.9rem);
-  border: 1px solid var(--color-border);
-  border-left: 4px solid var(--color-accent);
-  border-radius: var(--radius-medium);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-small);
   background: var(--color-surface);
   text-decoration: none;
   box-shadow: 0 8px 24px rgba(50, 38, 30, 0.025);
@@ -867,10 +866,10 @@ body.modal-open {
 }
 
 .cell-page-card .cell-card-kicker {
-  margin-bottom: 0.3rem;
   color: var(--color-accent-dark);
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-style: italic;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }

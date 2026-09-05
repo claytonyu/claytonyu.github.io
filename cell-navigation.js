@@ -107,7 +107,7 @@
       const startDot = document.createElementNS(svgNamespace, "circle");
       startDot.setAttribute("cx", startX);
       startDot.setAttribute("cy", startY);
-      startDot.setAttribute("r", "4");
+      startDot.setAttribute("r", "6");
       startDot.classList.add("cell-leader-dot");
       startDot.dataset.cellLeader = anchorName;
       overlay.appendChild(startDot);
