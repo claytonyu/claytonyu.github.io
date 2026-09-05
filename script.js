@@ -9,6 +9,7 @@ if (modal) {
   const modalTitle = modal.querySelector("#modal-title");
   const modalDescription = modal.querySelector("#modal-description");
   const modalLink = modal.querySelector("#modal-link");
+  const modalImage = modal.querySelector("#modal-image");
   const closeButton = modal.querySelector(".modal-close");
   let lastFocusedElement = null;
 
@@ -17,6 +18,19 @@ if (modal) {
 
     modalTitle.textContent = card.dataset.title;
     modalDescription.textContent = card.dataset.description;
+
+    // Reuse the preview image already inside the project card.
+    // This keeps the card and modal image in sync automatically.
+    const cardImage = card.querySelector(".project-card-image img");
+    if (cardImage) {
+      modalImage.src = cardImage.src;
+      modalImage.alt = cardImage.alt;
+      modalImage.parentElement.hidden = false;
+    } else {
+      modalImage.removeAttribute("src");
+      modalImage.alt = "";
+      modalImage.parentElement.hidden = true;
+    }
 
     const externalUrl = card.dataset.url;
     if (externalUrl && externalUrl !== "#") {
