@@ -12,25 +12,33 @@ if (modal) {
   const closeButton = modal.querySelector(".modal-close");
   let lastFocusedElement = null;
 
-  document.querySelectorAll("[data-project-open]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const card = button.closest(".project-card");
-      lastFocusedElement = button;
+  function openProject(card) {
+    lastFocusedElement = card;
 
-      modalTitle.textContent = card.dataset.title;
-      modalDescription.textContent = card.dataset.description;
+    modalTitle.textContent = card.dataset.title;
+    modalDescription.textContent = card.dataset.description;
 
-      const externalUrl = card.dataset.url;
-      if (externalUrl && externalUrl !== "#") {
-        modalLink.href = externalUrl;
-        modalLink.hidden = false;
-      } else {
-        modalLink.hidden = true;
+    const externalUrl = card.dataset.url;
+    if (externalUrl && externalUrl !== "#") {
+      modalLink.href = externalUrl;
+      modalLink.hidden = false;
+    } else {
+      modalLink.hidden = true;
+    }
+
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+    closeButton.focus();
+  }
+
+  document.querySelectorAll("[data-project-open]").forEach((card) => {
+    card.addEventListener("click", () => openProject(card));
+
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openProject(card);
       }
-
-      modal.hidden = false;
-      document.body.classList.add("modal-open");
-      closeButton.focus();
     });
   });
 

@@ -137,7 +137,7 @@ main {
 }
 
 .page-heading {
-  padding: 5rem 0 2.2rem;
+  padding: 2.5rem 0 2.2rem;
 }
 
 .page-heading h1,
@@ -169,7 +169,7 @@ main {
 
 /* ---------- Home hero ---------- */
 .hero {
-  padding: 5.5rem 0 3.8rem;
+  padding: 3rem 0 3.8rem;
 }
 
 .hero-grid {
@@ -346,6 +346,15 @@ main {
   border-radius: var(--radius-medium);
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(50, 38, 30, 0.035);
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.project-card:hover,
+.project-card:focus-visible {
+  background: #fbf4ee;
+  border-color: #c98a62;
+  box-shadow: 0 8px 24px rgba(50, 38, 30, 0.055);
 }
 
 .project-card-image {
@@ -388,13 +397,6 @@ main {
   padding: 0.35rem 0.62rem;
 }
 
-.project-actions {
-  display: flex;
-  gap: 0.65rem;
-  flex-wrap: wrap;
-  margin-top: auto;
-}
-
 .button,
 .button-secondary {
   display: inline-flex;
@@ -416,7 +418,9 @@ main {
 }
 
 .button:hover {
+  border-color: #6f371d;
   background: var(--color-accent-dark);
+  box-shadow: 0 0 0 2px rgba(143, 72, 36, 0.12);
 }
 
 .button-secondary {
@@ -475,6 +479,12 @@ main {
   background: transparent;
   font-size: 1.4rem;
   cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.modal-close:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
 }
 
 .modal-content {
@@ -539,7 +549,7 @@ body.modal-open {
 
   .hero,
   .page-heading {
-    padding-top: 3.4rem;
+    padding-top: 1.5rem;
   }
 
   .page-link-card {
@@ -608,7 +618,7 @@ body.modal-open {
 
 .cell-figure-wrap {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   margin-left: clamp(-9rem, -9vw, -4rem);
 }
 
@@ -735,7 +745,7 @@ body.modal-open {
 .cell-leader-overlay {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 3;
   width: 100%;
   height: 100%;
   overflow: visible;
@@ -770,7 +780,7 @@ body.modal-open {
 /* ---------- Cell-linked page cards ---------- */
 .cell-page-cards {
   position: relative;
-  z-index: 2;
+  z-index: 4;
   display: grid;
   gap: clamp(1.2rem, 4vh, 2.2rem);
 }

@@ -36,10 +36,13 @@
          data-title       = title shown in modal
          data-description = full project description
          data-url         = outside link; use # if unavailable
+
+         The entire card is clickable. Keyboard users can focus a card
+         and press Enter or Space to open the same detail pop-up.
          ===================================================== -->
     <section class="container project-grid" aria-label="Project list">
 
-      <article class="project-card"
+      <article class="project-card" tabindex="0" role="button" data-project-open
         data-title="[Project One Title]"
         data-description="[Full description for Project One. Explain the problem, methods, tools, your role, major results, and what you learned. This longer text appears in the pop-up window.]"
         data-url="https://example.com/">
@@ -53,14 +56,10 @@
             <span class="project-tag">Python</span>
             <span class="project-tag">Bioinformatics</span>
           </div>
-          <div class="project-actions">
-            <button class="button" type="button" data-project-open>View details</button>
-            <a class="button-secondary" href="https://example.com/" target="_blank" rel="noreferrer">External link</a>
-          </div>
         </div>
       </article>
 
-      <article class="project-card"
+      <article class="project-card" tabindex="0" role="button" data-project-open
         data-title="[Project Two Title]"
         data-description="[Full description for Project Two. Add enough detail here to make the pop-up useful to professors or employers reviewing your work.]"
         data-url="https://example.com/">
@@ -74,14 +73,10 @@
             <span class="project-tag">R</span>
             <span class="project-tag">Genomics</span>
           </div>
-          <div class="project-actions">
-            <button class="button" type="button" data-project-open>View details</button>
-            <a class="button-secondary" href="https://example.com/" target="_blank" rel="noreferrer">External link</a>
-          </div>
         </div>
       </article>
 
-      <article class="project-card"
+      <article class="project-card" tabindex="0" role="button" data-project-open
         data-title="[Project Three Title]"
         data-description="[Full description for Project Three. You can also use this space for a software tool, class project, poster, research pipeline, data visualization project, or publication-related work.]"
         data-url="#">
@@ -94,9 +89,6 @@
           <div class="project-tags">
             <span class="project-tag">Machine Learning</span>
             <span class="project-tag">Data Analysis</span>
-          </div>
-          <div class="project-actions">
-            <button class="button" type="button" data-project-open>View details</button>
           </div>
         </div>
       </article>
