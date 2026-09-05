@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Projects by [Your Name], computational biology student.">
+  <title>Projects | [Your Name]</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container navbar">
+      <a class="site-name" href="index.html">[Your Name]</a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="projects.html" aria-current="page">Projects</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="container page-heading">
+      <p class="eyebrow">Selected Work</p>
+      <h1>Projects</h1>
+      <p>Research, coding, data analysis, and other work can live here. Each project can include tags, a detailed pop-up description, and an external link.</p>
+    </section>
+
+    <!-- =====================================================
+         PROJECT GRID
+         To add a project, copy one entire <article> block.
+
+         data-title       = title shown in modal
+         data-description = full project description
+         data-url         = outside link; use # if unavailable
+         ===================================================== -->
+    <section class="container project-grid" aria-label="Project list">
+
+      <article class="project-card"
+        data-title="[Project One Title]"
+        data-description="[Full description for Project One. Explain the problem, methods, tools, your role, major results, and what you learned. This longer text appears in the pop-up window.]"
+        data-url="https://example.com/">
+        <div class="project-card-image">
+          <img src="https://placehold.co/900x560/f1dfd2/6a3c22?text=Project+Image" alt="Placeholder image for Project One">
+        </div>
+        <div class="project-card-content">
+          <h2>[Project One Title]</h2>
+          <p class="project-summary">[Short 1–2 sentence summary of the project.]</p>
+          <div class="project-tags">
+            <span class="project-tag">Python</span>
+            <span class="project-tag">Bioinformatics</span>
+          </div>
+          <div class="project-actions">
+            <button class="button" type="button" data-project-open>View details</button>
+            <a class="button-secondary" href="https://example.com/" target="_blank" rel="noreferrer">External link</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card"
+        data-title="[Project Two Title]"
+        data-description="[Full description for Project Two. Add enough detail here to make the pop-up useful to professors or employers reviewing your work.]"
+        data-url="https://example.com/">
+        <div class="project-card-image">
+          <img src="https://placehold.co/900x560/ead7ca/6a3c22?text=Research+Figure" alt="Placeholder image for Project Two">
+        </div>
+        <div class="project-card-content">
+          <h2>[Project Two Title]</h2>
+          <p class="project-summary">[Short 1–2 sentence summary of the project.]</p>
+          <div class="project-tags">
+            <span class="project-tag">R</span>
+            <span class="project-tag">Genomics</span>
+          </div>
+          <div class="project-actions">
+            <button class="button" type="button" data-project-open>View details</button>
+            <a class="button-secondary" href="https://example.com/" target="_blank" rel="noreferrer">External link</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card"
+        data-title="[Project Three Title]"
+        data-description="[Full description for Project Three. You can also use this space for a software tool, class project, poster, research pipeline, data visualization project, or publication-related work.]"
+        data-url="#">
+        <div class="project-card-image">
+          <img src="https://placehold.co/900x560/f3e7df/6a3c22?text=Project+Preview" alt="Placeholder image for Project Three">
+        </div>
+        <div class="project-card-content">
+          <h2>[Project Three Title]</h2>
+          <p class="project-summary">[Short 1–2 sentence summary of the project.]</p>
+          <div class="project-tags">
+            <span class="project-tag">Machine Learning</span>
+            <span class="project-tag">Data Analysis</span>
+          </div>
+          <div class="project-actions">
+            <button class="button" type="button" data-project-open>View details</button>
+          </div>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <!-- Shared project details modal -->
+  <div class="modal" id="project-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Project title</h2>
+        <button class="modal-close" type="button" aria-label="Close project details">×</button>
+      </div>
+      <div class="modal-content">
+        <p id="modal-description"></p>
+        <a class="button" id="modal-link" href="#" target="_blank" rel="noreferrer">Visit project</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>© [Year] [Your Name]</span>
+      <span><a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a> · Designed and developed in part with AI assistance.</span>
+    </div>
+  </footer>
+</body>
+</html>
