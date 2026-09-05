@@ -115,14 +115,27 @@
             </g>
 
             <!-- ROUGH ENDOPLASMIC RETICULUM
+                 Simplified as nested "C" shaped cisternae, wrapped
+                 around the left side of the nucleus like layers of
+                 an onion, with ribosome dots studding the outer
+                 folds. Colors are set inline so this renders
+                 correctly even if the page's stylesheet doesn't
+                 have a rule for this exact shape.
                  Available future anchor name: er -->
             <g class="cell-organelle cell-organelle-er" data-cell-source="er">
-              <path d="M155,221 C112,204 109,174 148,166 C185,159 202,179 226,159"/>
-              <path d="M151,239 C104,236 99,266 131,281 C163,296 187,270 209,277"/>
-              <path d="M145,304 C105,315 111,349 148,353 C181,357 196,330 217,337"/>
-              <circle cx="132" cy="195" r="4"/><circle cx="156" cy="170" r="4"/><circle cx="119" cy="254" r="4"/>
-              <circle cx="147" cy="280" r="4"/><circle cx="127" cy="329" r="4"/><circle cx="165" cy="349" r="4"/>
-              <circle class="cell-anchor-marker" cx="124" cy="280" r="7" data-cell-anchor-marker="er"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:6;stroke-linecap:round" d="M184.4,231.9 A60,60 0 1,0 184.4,330.1"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:6;stroke-linecap:round" d="M177.5,241.7 A48,48 0 1,0 177.5,320.3"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:6;stroke-linecap:round" d="M170.6,251.5 A36,36 0 1,0 170.6,310.5"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:6;stroke-linecap:round" d="M163.8,261.3 A24,24 0 1,0 163.8,300.7"/>
+              <circle style="fill:#b96432" cx="92" cy="266" r="4"/>
+              <circle style="fill:#b96432" cx="90" cy="296" r="4"/>
+              <circle style="fill:#b96432" cx="98" cy="251" r="4"/>
+              <circle style="fill:#b96432" cx="98" cy="311" r="4"/>
+              <circle style="fill:#b96432" cx="108" cy="257" r="4"/>
+              <circle style="fill:#b96432" cx="108" cy="305" r="4"/>
+              <circle style="fill:#b96432" cx="128" cy="245" r="3.5"/>
+              <circle style="fill:#b96432" cx="128" cy="317" r="3.5"/>
+              <circle class="cell-anchor-marker" cx="182" cy="281" r="7" data-cell-anchor-marker="er"/>
             </g>
 
             <!-- GOLGI APPARATUS
@@ -139,17 +152,36 @@
             </g>
 
             <!-- MITOCHONDRION
+                 A rotated ellipse (outer membrane) with a smaller
+                 inset ellipse (inner membrane) and alternating fold
+                 lines (cristae). The rotation is baked directly into
+                 the path coordinates (rather than an SVG transform)
+                 and colors are set inline, so the shape can't be
+                 knocked out of place or turned black by an
+                 unrelated CSS rule elsewhere on the page.
                  Available future anchor name: mitochondrion -->
             <g class="cell-organelle cell-organelle-mito" data-cell-source="mitochondrion">
-              <path d="M344,127 C381,101 429,111 443,145 C456,178 429,205 391,201 C354,197 325,170 344,127 Z"/>
-              <path class="organelle-inner-line" d="M354,145 C373,128 385,168 403,150 C418,135 426,162 434,169"/>
-              <circle class="cell-anchor-marker" cx="428" cy="133" r="7" data-cell-anchor-marker="mitochondrion"/>
+              <path style="fill:#dba274;stroke:#8a4a2a;stroke-width:3" d="M491.3,151.0 A58,32 -14 1,1 378.7,179.0 A58,32 -14 1,1 491.3,151.0 Z"/>
+              <path style="fill:#eecba0;stroke:#8a4a2a;stroke-width:1.5" d="M484.5,152.7 A51,25 -14 1,1 385.5,177.3 A51,25 -14 1,1 484.5,152.7 Z"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M398.6,155.5 L403.5,174.9"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M419.0,166.9 L423.8,186.3"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M430.6,147.5 L435.5,166.9"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M450.0,159.2 L454.9,178.6"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M462.7,139.6 L467.5,159.0"/>
+              <circle class="cell-anchor-marker" cx="487" cy="152" r="7" data-cell-anchor-marker="mitochondrion"/>
             </g>
 
-            <!-- SECOND MITOCHONDRION (decorative) -->
+            <!-- SECOND MITOCHONDRION (decorative), same construction
+                 at a smaller size, a different tilt, and moved well
+                 clear of the ribosomes below so nothing overlaps -->
             <g class="cell-organelle cell-organelle-mito cell-organelle-decorative" aria-hidden="true">
-              <path d="M213,428 C245,399 292,407 307,438 C322,471 299,498 263,496 C226,493 191,464 213,428 Z"/>
-              <path class="organelle-inner-line" d="M221,449 C239,430 252,470 269,448 C282,432 293,457 300,466"/>
+              <path style="fill:#dba274;stroke:#8a4a2a;stroke-width:3" d="M233.8,481.4 A55,30 12 1,1 126.2,458.6 A55,30 12 1,1 233.8,481.4 Z"/>
+              <path style="fill:#eecba0;stroke:#8a4a2a;stroke-width:1.5" d="M227.9,480.2 A49,24 12 1,1 132.1,459.8 A49,24 12 1,1 227.9,480.2 Z"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M154.2,447.1 L150.2,465.7"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M166.7,465.1 L162.8,483.7"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M185.5,453.8 L181.5,472.4"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M198.0,471.8 L194.1,490.4"/>
+              <path style="fill:none;stroke:#8a4a2a;stroke-width:2;stroke-linecap:round" d="M216.8,460.4 L212.8,479.0"/>
             </g>
 
             <!-- RIBOSOMES
