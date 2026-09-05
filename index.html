@@ -27,7 +27,9 @@
   </header>
 
   <main id="main-content">
-    <!-- Hero -->
+    <!-- =====================================================
+         HERO / INTRODUCTION
+         ===================================================== -->
     <section class="hero">
       <div class="container hero-grid">
         <div>
@@ -53,32 +55,154 @@
       </div>
     </section>
 
-    <!-- Large page links -->
-    <section class="container page-links" aria-label="Explore portfolio">
-      <a class="page-link-card" href="about.html">
-        <div>
-          <h2>About</h2>
-          <p>Learn more about my education, research experience, interests, and background.</p>
-        </div>
-        <span class="page-link-arrow" aria-hidden="true">→</span>
-      </a>
+    <!-- =====================================================
+         INTERACTIVE CELL NAVIGATION
 
-      <a class="page-link-card" href="projects.html">
-        <div>
-          <h2>Projects</h2>
-          <p>Explore selected research, software, analysis, and computational biology projects.</p>
-        </div>
-        <span class="page-link-arrow" aria-hidden="true">→</span>
-      </a>
+         HOW THE HTML <-> SVG CONNECTION WORKS
+         --------------------------------------
+         1. A card chooses an organelle with:
+              data-cell-anchor="nucleus"
 
-      <!-- Copy this block when you add another page later. -->
-      <a class="page-link-card" href="#">
-        <div>
-          <h2>[Future Page]</h2>
-          <p>[Short description of a future page, such as Publications, Coursework, or Writing.]</p>
+         2. The SVG contains a matching marker:
+              data-cell-anchor-marker="nucleus"
+
+         3. The organelle group itself has:
+              data-cell-source="nucleus"
+
+         cell-navigation.js matches these names automatically.
+         To point a card somewhere else, change ONLY the card's
+         data-cell-anchor value.
+
+         To add a brand-new anchor, add a marker + source group
+         with the same new name inside the SVG.
+         ===================================================== -->
+    <section class="cell-navigation" data-cell-navigation aria-labelledby="cell-navigation-title">
+      <div class="container cell-navigation-heading">
+        <p class="eyebrow">Explore</p>
+        <h2 id="cell-navigation-title">A cell-sized map of my work</h2>
+        <p>Choose a part of the cell—or its connected card—to explore the site.</p>
+      </div>
+
+      <div class="container cell-navigation-layout">
+        <!-- Lines are generated here by cell-navigation.js. -->
+        <svg class="cell-leader-overlay" data-cell-leader-overlay aria-hidden="true"></svg>
+
+        <!-- LEFT: stylized animal cell diagram -->
+        <div class="cell-figure-wrap">
+          <svg class="cell-figure" viewBox="0 0 620 610" role="img" aria-labelledby="cell-title cell-desc">
+            <title id="cell-title">Stylized animal cell used as website navigation</title>
+            <desc id="cell-desc">A warm-toned animal cell diagram. Linked organelles connect to page cards on the right.</desc>
+
+            <!-- Cell membrane / cytoplasm -->
+            <path class="cell-body" d="M72,268 C80,152 174,62 304,55 C438,48 548,123 574,244 C602,374 524,505 393,548 C263,592 114,534 67,411 C45,354 48,313 72,268 Z"/>
+            <path class="cell-membrane-inner" d="M88,272 C97,167 183,82 306,74 C426,67 526,135 550,247 C576,365 505,483 384,523 C266,563 132,511 88,401 C67,349 66,313 88,272 Z"/>
+
+            <!-- Decorative cytoplasm speckles -->
+            <g class="cell-speckles" aria-hidden="true">
+              <circle cx="180" cy="175" r="5"/><circle cx="437" cy="176" r="4"/><circle cx="476" cy="340" r="5"/>
+              <circle cx="164" cy="414" r="4"/><circle cx="346" cy="477" r="4"/><circle cx="111" cy="323" r="3"/>
+              <circle cx="505" cy="259" r="3"/><circle cx="276" cy="118" r="4"/><circle cx="241" cy="493" r="3"/>
+            </g>
+
+            <!-- NUCLEUS
+                 Name used by cards: nucleus -->
+            <g class="cell-organelle cell-organelle-nucleus" data-cell-source="nucleus">
+              <ellipse cx="272" cy="281" rx="103" ry="91"/>
+              <ellipse class="organelle-inner" cx="272" cy="281" rx="84" ry="73"/>
+              <circle class="nucleolus" cx="293" cy="294" r="25"/>
+              <!-- Anchor marker: move this circle to move where the leader begins. -->
+              <circle class="cell-anchor-marker" cx="350" cy="244" r="7" data-cell-anchor-marker="nucleus"/>
+            </g>
+
+            <!-- ROUGH ENDOPLASMIC RETICULUM
+                 Available future anchor name: er -->
+            <g class="cell-organelle cell-organelle-er" data-cell-source="er">
+              <path d="M155,221 C112,204 109,174 148,166 C185,159 202,179 226,159"/>
+              <path d="M151,239 C104,236 99,266 131,281 C163,296 187,270 209,277"/>
+              <path d="M145,304 C105,315 111,349 148,353 C181,357 196,330 217,337"/>
+              <circle cx="132" cy="195" r="4"/><circle cx="156" cy="170" r="4"/><circle cx="119" cy="254" r="4"/>
+              <circle cx="147" cy="280" r="4"/><circle cx="127" cy="329" r="4"/><circle cx="165" cy="349" r="4"/>
+              <circle class="cell-anchor-marker" cx="124" cy="280" r="7" data-cell-anchor-marker="er"/>
+            </g>
+
+            <!-- GOLGI APPARATUS
+                 Name used by cards: golgi -->
+            <g class="cell-organelle cell-organelle-golgi" data-cell-source="golgi">
+              <path d="M384,319 C425,291 468,297 501,316"/>
+              <path d="M378,338 C424,315 469,320 506,341"/>
+              <path d="M382,359 C425,342 466,347 496,367"/>
+              <path d="M392,379 C428,367 459,371 482,387"/>
+              <circle class="golgi-vesicle" cx="509" cy="298" r="9"/>
+              <circle class="golgi-vesicle" cx="521" cy="371" r="7"/>
+              <circle class="golgi-vesicle" cx="472" cy="404" r="6"/>
+              <circle class="cell-anchor-marker" cx="494" cy="340" r="7" data-cell-anchor-marker="golgi"/>
+            </g>
+
+            <!-- MITOCHONDRION
+                 Available future anchor name: mitochondrion -->
+            <g class="cell-organelle cell-organelle-mito" data-cell-source="mitochondrion">
+              <path d="M344,127 C381,101 429,111 443,145 C456,178 429,205 391,201 C354,197 325,170 344,127 Z"/>
+              <path class="organelle-inner-line" d="M354,145 C373,128 385,168 403,150 C418,135 426,162 434,169"/>
+              <circle class="cell-anchor-marker" cx="428" cy="133" r="7" data-cell-anchor-marker="mitochondrion"/>
+            </g>
+
+            <!-- SECOND MITOCHONDRION (decorative) -->
+            <g class="cell-organelle cell-organelle-mito cell-organelle-decorative" aria-hidden="true">
+              <path d="M213,428 C245,399 292,407 307,438 C322,471 299,498 263,496 C226,493 191,464 213,428 Z"/>
+              <path class="organelle-inner-line" d="M221,449 C239,430 252,470 269,448 C282,432 293,457 300,466"/>
+            </g>
+
+            <!-- RIBOSOMES
+                 Available future anchor name: ribosome -->
+            <g class="cell-organelle cell-organelle-ribosomes" data-cell-source="ribosome">
+              <circle cx="392" cy="444" r="7"/><circle cx="417" cy="459" r="6"/><circle cx="441" cy="436" r="7"/>
+              <circle cx="462" cy="460" r="5"/><circle cx="479" cy="432" r="6"/>
+              <circle class="cell-anchor-marker" cx="458" cy="447" r="7" data-cell-anchor-marker="ribosome"/>
+            </g>
+
+            <!-- CELL MEMBRANE
+                 Available future anchor name: membrane -->
+            <g class="cell-organelle cell-organelle-membrane" data-cell-source="membrane">
+              <circle class="cell-anchor-marker" cx="547" cy="249" r="7" data-cell-anchor-marker="membrane"/>
+            </g>
+          </svg>
         </div>
-        <span class="page-link-arrow" aria-hidden="true">→</span>
-      </a>
+
+        <!-- RIGHT: page cards
+             To change a connection, edit data-cell-anchor only. -->
+        <div class="cell-page-cards" data-cell-cards>
+          <a class="cell-page-card" href="about.html" data-cell-anchor="nucleus">
+            <div>
+              <p class="cell-card-kicker">Nucleus</p>
+              <h3>About</h3>
+              <p>Learn more about my education, research experience, interests, and background.</p>
+            </div>
+            <span class="page-link-arrow" aria-hidden="true">→</span>
+          </a>
+
+          <a class="cell-page-card" href="projects.html" data-cell-anchor="golgi">
+            <div>
+              <p class="cell-card-kicker">Golgi apparatus</p>
+              <h3>Projects</h3>
+              <p>Explore selected research, software, analysis, and computational biology projects.</p>
+            </div>
+            <span class="page-link-arrow" aria-hidden="true">→</span>
+          </a>
+
+          <!-- =================================================
+               ADDING A FUTURE CARD
+               Copy a card above, change href/text, then choose
+               any existing anchor name, for example:
+
+               data-cell-anchor="mitochondrion"
+               data-cell-anchor="er"
+               data-cell-anchor="ribosome"
+               data-cell-anchor="membrane"
+
+               Or add your own marker/source pair to the SVG.
+               ================================================= -->
+        </div>
+      </div>
     </section>
   </main>
 
@@ -89,5 +213,8 @@
       <span><a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a> · Designed and developed in part with AI assistance.</span>
     </div>
   </footer>
+
+  <!-- Homepage-only interaction code -->
+  <script src="cell-navigation.js"></script>
 </body>
 </html>
