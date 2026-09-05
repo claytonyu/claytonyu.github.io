@@ -232,6 +232,22 @@ main {
   border-color: var(--color-accent);
 }
 
+.contact-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.contact-icon-fill {
+  fill: currentColor;
+  stroke: none;
+}
+
 /* ---------- Home page navigation blocks ---------- */
 .page-links {
   display: grid;
@@ -449,7 +465,7 @@ main {
 }
 
 .modal-panel {
-  width: min(100%, 980px);
+  width: min(100%, 760px);
   max-height: min(86vh, 820px);
   overflow-y: auto;
   background: var(--color-surface);
@@ -488,57 +504,11 @@ main {
 }
 
 .modal-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-  gap: 1.5rem;
-  align-items: start;
   padding: 1rem 1.4rem 1.5rem;
 }
 
-.modal-text {
-  min-width: 0;
-}
-
 .modal-content p {
-  margin-top: 0;
   color: var(--color-muted);
-}
-
-.modal-image-wrap {
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-medium);
-  background: var(--color-accent-soft);
-}
-
-.modal-image-wrap[hidden] {
-  display: none;
-}
-
-.modal-image-wrap img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-}
-
-@media (max-width: 700px) {
-  .modal-panel {
-    width: min(100%, 620px);
-  }
-
-  .modal-content {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-image-wrap {
-    grid-row: 1;
-  }
-
-  .modal-text {
-    grid-row: 2;
-  }
 }
 
 body.modal-open {
@@ -784,7 +754,7 @@ body.modal-open {
 }
 
 .cell-organelle.is-active {
-  filter: drop-shadow(0 0 20px rgba(38, 19, 10, 0.5));
+  filter: drop-shadow(0 0 10px rgba(143, 72, 36, 0.28));
 }
 
 /* ---------- Dogleg leader overlay ---------- */
@@ -801,7 +771,7 @@ body.modal-open {
 .cell-leader-line {
   fill: none;
   stroke: #9a887b;
-  stroke-width: 5;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
@@ -815,7 +785,7 @@ body.modal-open {
 
 .cell-leader-line.is-active {
   stroke: var(--color-accent-dark);
-  stroke-width: 8;
+  stroke-width: 2.6;
 }
 
 .cell-leader-dot.is-active {
@@ -838,8 +808,9 @@ body.modal-open {
   align-items: center;
   min-height: 168px;
   padding: clamp(1.3rem, 3vw, 1.9rem);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-small);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent);
+  border-radius: var(--radius-medium);
   background: var(--color-surface);
   text-decoration: none;
   box-shadow: 0 8px 24px rgba(50, 38, 30, 0.025);
@@ -866,10 +837,10 @@ body.modal-open {
 }
 
 .cell-page-card .cell-card-kicker {
+  margin-bottom: 0.3rem;
   color: var(--color-accent-dark);
-  font-size: 0.75rem;
-  font-weight: 500;
-  font-style: italic;
+  font-size: 0.78rem;
+  font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
