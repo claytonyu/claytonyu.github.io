@@ -1,7 +1,15 @@
 /* =========================================================
    Portfolio Website Styles
-   Edit the variables in :root to quickly change site colors.
    ========================================================= */
+
+/*
+15-113 Project 1 - Comment
+This file was almost completely generated with AI. Coming into this project, I had basic understanding of the selectors and static properties of CSS.
+However, I couldn't write CSS well enough to create, from-scratch, good webpage design.
+
+While interacting with AI tools, I learned about css variables and media queries, and pseudo-classes like hover.
+I tested this by making the .site-name change color when hovered.
+*/
 
 :root {
   --color-bg: #f7f4ef;
@@ -475,7 +483,7 @@ main {
 
 .modal-panel {
   width: min(100%, 760px);
-  max-height: min(86vh, 820px);
+  max-height: min(86vh, 820px); /* Note: vh refers to percent of viewport height (scales with size) */
   overflow-y: auto;
   background: var(--color-surface);
   border-radius: var(--radius-large);
@@ -818,7 +826,7 @@ body.modal-open {
   align-items: center;
   min-height: 168px;
   padding: clamp(1.3rem, 3vw, 1.9rem);
-  border: 2px solid var(--color-border);
+  border: 3px solid var(--color-border);
   border-radius: var(--radius-small);
   background: var(--color-surface);
   text-decoration: none;

@@ -1,3 +1,11 @@
+<!-- 
+ 15-113 Project 1 - Comment
+ script.js handles the shared modal for the projects here. ChatGPT generated most of this, but I didn't like the flow of clicking.
+ It previously had a separate "View in Detail" to popup the modal, which I removed in favor of a more clear hover to show that each project card was clickable.
+
+ I also asked ChatGPT to support viewing the image within the modal, but I dislike the current layout and may change it in the future.
+ I ended up manually changing the styles applied to .modal-header to have a border to separate it from the content.
+ -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,7 +103,7 @@
     </section>
   </main>
 
-  <!-- Shared project details modal -->
+  <!-- Project details modal (popup window) shared among all project boxes -->
   <div class="modal" id="project-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
     <div class="modal-panel">
       <div class="modal-header">

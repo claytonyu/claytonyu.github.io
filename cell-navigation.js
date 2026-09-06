@@ -17,8 +17,13 @@
    to:
        data-cell-anchor="mitochondrion"
    ========================================================= */
+/*
+15-113 Project 1 - Comment
+ChatGPT generated this code that generates and attaches functions to hover / unhovering of the cell parts and corresponding cards.
 
-(() => {
+I've modified a couple of the values for appearance (ex: increased startDot radius to 6 to make it more clear.)
+*/
+function createCellNavigation() {
   const section = document.querySelector("[data-cell-navigation]");
   if (!section) return;
 
@@ -181,4 +186,6 @@
   // and once after the full page load.
   scheduleDraw();
   window.addEventListener("load", scheduleDraw, { once: true });
-})();
+}
+
+createCellNavigation();

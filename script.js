@@ -3,6 +3,15 @@
    Handles project detail pop-up windows (modals).
    ========================================================= */
 
+/*
+15-113 Project 1 - Comment
+I used AI to generate this code that opens/closes the modal whenever a new project is focused.
+I've followed a Khan Academy tutorial on HTML/JS interaction, and used ChatGPT to explain parts I don't understand.
+
+I have tailored some of this code. For example, ChatGPT wrote code that tracked what element was previously focused before opening the modal,
+and re-focused it after closing. However, I didn't like the way this appeared on mobile (using Chrome DevTools). Therefore, I removed this feature.
+*/
+
 const modal = document.querySelector("#project-modal");
 
 if (modal) {
