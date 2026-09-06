@@ -11,11 +11,8 @@ if (modal) {
   const modalLink = modal.querySelector("#modal-link");
   const modalImage = modal.querySelector("#modal-image");
   const closeButton = modal.querySelector(".modal-close");
-  let lastFocusedElement = null;
 
   function openProject(card) {
-    lastFocusedElement = card;
-
     modalTitle.textContent = card.dataset.title;
     modalDescription.textContent = card.dataset.description;
 
@@ -59,7 +56,6 @@ if (modal) {
   function closeModal() {
     modal.hidden = true;
     document.body.classList.remove("modal-open");
-    if (lastFocusedElement) lastFocusedElement.focus();
   }
 
   closeButton.addEventListener("click", closeModal);
