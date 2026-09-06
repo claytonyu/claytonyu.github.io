@@ -102,10 +102,19 @@ main {
   gap: 1.5rem;
 }
 
+/* Top-left Site Title */
 .site-name {
-  font-weight: 750;
+  font-size: 1.8em;
+  padding: 0 0.3em;
+  border: 2px solid black;
+  font-weight: 1000;
   text-decoration: none;
   letter-spacing: -0.02em;
+}
+
+.site-name:hover {
+  border-color: var(--color-accent-dark);
+  color: var(--color-accent-dark);
 }
 
 .nav-links {
