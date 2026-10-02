@@ -54,7 +54,8 @@ export function update() {
   pruneSelection();
   refreshSyncControl(refs.syncControl);
   refs.courseSortField.hidden = state.taskView.layout !== "grouped";
-  refs.selectionBar.replaceChildren(...selectionBarContent());
+  // replaceChildren would render a skipped optional button (false) as the text "false".
+  refs.selectionBar.replaceChildren(...selectionBarContent().filter(Boolean));
   refs.selectionBar.hidden = selected.size === 0;
   refs.results.setAttribute("aria-busy", String(!state.tasksLoaded));
   refs.results.replaceChildren(results());
