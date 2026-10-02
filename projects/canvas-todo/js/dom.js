@@ -36,13 +36,14 @@ export function focusKeyOf(element) {
 }
 
 // Falls back to the view heading if the keyed control no longer exists (e.g. its row was deleted).
+// Never scrolls: restoring focus after a re-render shouldn't move the page under the user.
 export function restoreFocus(key) {
   if (!key) return;
   const target = document.querySelector(`[data-focus-key="${CSS.escape(key)}"]`);
-  if (target) target.focus();
+  if (target) target.focus({ preventScroll: true });
   else focusViewHeading();
 }
 
 export function focusViewHeading() {
-  document.querySelector("#view h1")?.focus();
+  document.querySelector("#view h1")?.focus({ preventScroll: true });
 }

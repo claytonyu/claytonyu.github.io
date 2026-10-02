@@ -23,7 +23,7 @@ export function openModal({ title, message, confirmLabel = "OK", cancelLabel = n
       dialog.close();
       dialog.remove();
       // If the opener was re-rendered meanwhile, find its replacement (or the view heading).
-      if (returnFocus?.isConnected) returnFocus.focus();
+      if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
       else if (focusKeyOf(returnFocus)) restoreFocus(focusKeyOf(returnFocus));
       else focusViewHeading();
       resolve(result);

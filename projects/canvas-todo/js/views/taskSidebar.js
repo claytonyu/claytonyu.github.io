@@ -1,5 +1,6 @@
 // Right-hand sidebar for creating, viewing and editing one task.
-// Built on <dialog>.showModal(), which traps focus, makes the page behind it inert and closes on Escape.
+// Non-modal: it sits beside the list (which narrows to make room) and never blocks the page.
+// Focus moves into it on open, Escape closes it, and focus returns to the task on close.
 import { el, isHttpsUrl, restoreFocus } from "../dom.js";
 import { state } from "../state.js";
 import { createTask, updateTasks } from "../actions.js";
@@ -13,18 +14,29 @@ import {
   RECURRENCE_LABELS, formatDateTime, toLocalInputValue, fromLocalInputValue, completionMessage,
 } from "../format.js";
 
-let current = null; // { dialog, task, controls, snapshot, returnFocus }
+let current = null; // { panel, task, controls, snapshot, returnFocusKey }
 
-export function openTaskSidebar(task = null) {
-  closeTaskSidebar();
-  const controls = buildControls(task);
-  const dialog = el("dialog", { className: "sidebar", "aria-labelledby": "sidebar-title" });
-  // Focus goes back by key rather than element: the row may be re-rendered while the sidebar is
-  // open, and Safari doesn't focus buttons on click.
-  current = { dialog, task, controls, returnFocusKey: task ? `task-${task.id}` : "new-task" };
+// task: the task to edit, or null to create one.
+// options.courseId pre-fills the course for a new task; options.returnFocusKey is the control
+// to refocus on close (by key rather than element, since the row may re-render while open and
+// Safari doesn't focus buttons on click).
+export async function openTaskSidebar(task = null, { courseId = null, returnFocusKey = "new-task" } = {}) {
+  if (!(await confirmDiscardIfDirty())) return;
+  closeTaskSidebar({ restore: false });
+
+  const controls = buildControls(task, courseId);
+  const panel = el("aside", {
+    className: "sidebar",
+    role: "dialog",
+    "aria-labelledby": "sidebar-title",
+    onkeydown: (event) => {
+      if (event.key === "Escape") requestClose();
+    },
+  });
+  current = { panel, task, controls, returnFocusKey: task ? `task-${task.id}` : returnFocusKey };
   current.snapshot = JSON.stringify(readForm());
 
-  dialog.append(
+  panel.append(
     sidebarHeader(task),
     el("form", { className: "sidebar__body", noValidate: true, onsubmit: onSubmit }, [
       task?.html_url && canvasNotice(task),
@@ -33,46 +45,42 @@ export function openTaskSidebar(task = null) {
       sidebarActions(task, controls),
     ]),
   );
-  dialog.addEventListener("cancel", (event) => {
-    event.preventDefault();
-    requestClose();
-  });
 
-  document.body.append(dialog);
-  dialog.showModal();
-  controls.title.focus();
+  document.querySelector(".app").append(panel);
+  controls.title.focus({ preventScroll: true });
 }
 
-export function closeTaskSidebar() {
+export function closeTaskSidebar({ restore = true } = {}) {
   if (!current) return;
-  const { dialog, returnFocusKey } = current;
+  const { panel, returnFocusKey } = current;
   current = null;
-  dialog.close();
-  dialog.remove();
-  restoreFocus(returnFocusKey);
+  panel.remove();
+  if (restore) restoreFocus(returnFocusKey);
 }
 
 export function isTaskSidebarDirty() {
   return current !== null && JSON.stringify(readForm()) !== current.snapshot;
 }
 
+// Resolves true when it's fine to throw away the open form.
+async function confirmDiscardIfDirty() {
+  if (!isTaskSidebarDirty()) return true;
+  return openModal({
+    title: "Discard changes?",
+    message: "Your changes to this task haven't been saved.",
+    confirmLabel: "Discard",
+    cancelLabel: "Keep editing",
+    danger: true,
+  });
+}
+
 async function requestClose() {
-  if (isTaskSidebarDirty()) {
-    const discard = await openModal({
-      title: "Discard changes?",
-      message: "Your changes to this task haven't been saved.",
-      confirmLabel: "Discard",
-      cancelLabel: "Keep editing",
-      danger: true,
-    });
-    if (!discard) return;
-  }
-  closeTaskSidebar();
+  if (await confirmDiscardIfDirty()) closeTaskSidebar();
 }
 
 // ----- Building the form -----
 
-function buildControls(task) {
+function buildControls(task, courseId) {
   return {
     title: el("input", { id: "task-title", className: "input", required: true, value: task?.title ?? "" }),
     description: el("textarea", { id: "task-description", className: "input", rows: 5, value: task?.description ?? "" }),
@@ -82,7 +90,7 @@ function buildControls(task) {
       options: Object.entries(RECURRENCE_LABELS),
       value: task?.recurrence ?? "none",
     }),
-    course: selectControl({ id: "task-course", options: courseOptions(), value: String(task?.course_id ?? "") }),
+    course: selectControl({ id: "task-course", options: courseOptions(), value: String((task ? task.course_id : courseId) ?? "") }),
     completed: el("input", { id: "task-completed", type: "checkbox", checked: task?.completed ?? false }),
     save: el("button", { type: "submit", className: "button button--primary" }, task ? "Save changes" : "Create task"),
   };

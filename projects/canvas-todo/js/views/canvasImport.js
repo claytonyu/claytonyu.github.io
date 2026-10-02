@@ -1,6 +1,7 @@
 // Canvas Import: decide which courses to sync and which assignments to import as tasks.
-// New (pending) items float to the top with a gold highlight. Already-decided assignments are
-// hidden unless "Show decided assignments" is ticked, and can be flipped with their checkbox.
+// New (pending) items float to the top with a gold highlight. Already-decided assignments sit in a
+// collapsed per-course section, where each can be flipped with its checkbox.
+// Focus is restored without scrolling, so decisions and syncs never move the page.
 import { el, focusKeyOf, restoreFocus } from "../dom.js";
 import { state, emit } from "../state.js";
 import { setCourseStatus, setAssignmentStatus } from "../canvas.js";
@@ -13,6 +14,7 @@ import { createSyncControl, refreshSyncControl } from "./syncButton.js";
 const STATUS_ORDER = { pending: 0, kept: 1, ignored: 2 };
 let refs = null; // { results, syncControl }
 let busy = false; // a decision request is in flight
+const expanded = new Set(); // course ids whose decided-assignments section is open
 
 export function mount(root) {
   refs = { results: el("div", { className: "results" }), syncControl: createSyncControl() };
@@ -45,15 +47,6 @@ function toolbar() {
       value: view.search,
       onSearch: (value) => { view.search = value; emit(); },
     }),
-    el("div", { className: "checkbox-field" }, [
-      el("input", {
-        id: "import-show-decided",
-        type: "checkbox",
-        checked: view.showDecided,
-        onchange: (event) => { view.showDecided = event.target.checked; emit(); },
-      }),
-      el("label", { htmlFor: "import-show-decided" }, "Show decided assignments"),
-    ]),
   ]);
 }
 
@@ -84,9 +77,10 @@ function decideAssignments(course, assignments, status) {
   const message = status === "kept"
     ? `Imported ${subject} as ${assignments.length === 1 ? "a task" : "tasks"}.`
     : `Ignored ${subject}.`;
-  const focusKey = assignments.length === 1 && state.importView.showDecided
+  // Decided items land in the collapsed section, so focus its toggle unless the row is visible there.
+  const focusKey = assignments.length === 1 && expanded.has(course.id)
     ? `assignment-${assignments[0].id}-toggle`
-    : `course-${course.id}`;
+    : `decided-${course.id}`;
   decide(() => setAssignmentStatus(assignments, status), message, focusKey);
 }
 
@@ -176,18 +170,29 @@ function courseBody(course, assignments) {
 
   const pending = assignments.filter((item) => item.status === "pending");
   const decided = assignments.filter((item) => item.status !== "pending");
-  const showDecided = state.importView.showDecided;
   if (assignments.length === 0) {
     return el("p", { className: "import-course__note" }, state.syncing ? "Loading assignments…" : "No assignments found.");
   }
   return el("div", { className: "import-course__body" }, [
     pending.length > 1 && bulkBar(course, pending),
-    (pending.length > 0 || (showDecided && decided.length > 0)) && el("ul", { className: "assignment-list" }, [
-      pending.map((item) => pendingRow(course, item)),
-      showDecided && decided.map((item) => decidedRow(course, item)),
-    ]),
-    !showDecided && decided.length > 0 && el("p", { className: "import-course__note" },
-      `${decided.length} decided assignment${decided.length === 1 ? "" : "s"} hidden.`),
+    pending.length > 0 && el("ul", { className: "assignment-list" }, pending.map((item) => pendingRow(course, item))),
+    decided.length > 0 && decidedSection(course, decided),
+  ]);
+}
+
+// Native <details> gives the expand/collapse toggle and its keyboard/ARIA behavior for free.
+function decidedSection(course, decided) {
+  return el("details", {
+    className: "decided",
+    open: expanded.has(course.id),
+    ontoggle: (event) => {
+      if (event.target.open) expanded.add(course.id);
+      else expanded.delete(course.id);
+    },
+  }, [
+    el("summary", { className: "decided__summary", dataset: { focusKey: `decided-${course.id}` } },
+      `${decided.length} decided assignment${decided.length === 1 ? "" : "s"}`),
+    el("ul", { className: "assignment-list" }, decided.map((item) => decidedRow(course, item))),
   ]);
 }
 

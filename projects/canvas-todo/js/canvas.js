@@ -14,6 +14,11 @@ export function runSync() {
   return syncInFlight;
 }
 
+// Page changes only sync when something calls for it (new session, or the last sync failed).
+export function syncIfNeeded() {
+  if (state.syncNeeded) runSync();
+}
+
 async function sync() {
   state.syncing = true;
   emit();
@@ -22,6 +27,7 @@ async function sync() {
     await api.syncCanvas();
     await reloadData();
     state.lastSyncedAt = new Date();
+    state.syncNeeded = false;
   } catch (error) {
     handleError(error, { retry: runSync });
   } finally {

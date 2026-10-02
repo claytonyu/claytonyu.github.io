@@ -14,6 +14,7 @@ import { courseNameFor, filterTasks, sortTasks, groupTasks } from "../taskQuery.
 import { openTaskSidebar } from "./taskSidebar.js";
 import { confirmAndDeleteTasks } from "./confirmDelete.js";
 import { createSyncControl, refreshSyncControl } from "./syncButton.js";
+import { pendingCount } from "../canvas.js";
 
 const selected = new Set(); // ids of tasks selected for bulk actions
 let refs = null; // { results, selectionBar, courseSortField, syncControl }
@@ -133,6 +134,18 @@ function selectionBarContent() {
     el("span", { role: "status" }, `${selected.size} selected`),
     el("button", {
       type: "button",
+      className: "button button--small",
+      dataset: { focusKey: "bulk-done" },
+      onclick: (event) => setCompleted(tasks, true, event.currentTarget),
+    }, "Mark done"),
+    tasks.some((task) => task.completed) && el("button", {
+      type: "button",
+      className: "button button--small",
+      dataset: { focusKey: "bulk-undone" },
+      onclick: (event) => setCompleted(tasks, false, event.currentTarget),
+    }, "Mark not done"),
+    el("button", {
+      type: "button",
       className: "button button--danger button--small",
       dataset: { focusKey: "bulk-delete" },
       onclick: () => confirmAndDeleteTasks(tasks),
@@ -153,7 +166,7 @@ function results() {
   const nameOf = (courseId) => courseNameFor(state.courses, courseId);
   const visible = sortTasks(filterTasks(state.tasks, view, nameOf), view.sort);
 
-  if (state.tasks.length === 0) return emptyState("No tasks yet. Create one, or import assignments from Canvas.");
+  if (state.tasks.length === 0) return noTasksState();
   if (view.layout === "list") {
     return visible.length ? taskList(visible, { showCourse: true }) : emptyState(noMatchesMessage());
   }
@@ -170,12 +183,30 @@ function emptyState(message) {
   return el("p", { className: "empty" }, message);
 }
 
+function noTasksState() {
+  const pending = pendingCount();
+  return el("div", { className: "empty empty--cta" }, [
+    el("p", {}, "No tasks yet. Create one with “+ New Task”, or bring in your assignments:"),
+    el("a", { href: "#/import", className: "button button--primary" }, "Import from Canvas"),
+    pending > 0 && el("p", { className: "hint" }, `${pending} new Canvas item${pending === 1 ? " is" : "s are"} waiting for you.`),
+  ]);
+}
+
 function courseGroup(group) {
-  const headingId = `group-${group.id ?? "none"}`;
+  const key = group.id ?? "none";
+  const headingId = `group-${key}`;
   return el("section", { className: "course-group", "aria-labelledby": headingId }, [
-    el("h2", { id: headingId, className: "course-group__title" }, [
-      group.name,
-      el("span", { className: "course-group__count" }, ` ${group.tasks.length}`),
+    el("div", { className: "course-group__header" }, [
+      el("h2", { id: headingId, className: "course-group__title" }, [
+        group.name,
+        el("span", { className: "course-group__count" }, ` ${group.tasks.length}`),
+      ]),
+      el("button", {
+        type: "button",
+        className: "button button--small",
+        dataset: { focusKey: `new-task-${key}` },
+        onclick: () => openTaskSidebar(null, { courseId: group.id, returnFocusKey: `new-task-${key}` }),
+      }, ["+ New task", el("span", { className: "visually-hidden" }, ` in ${group.name}`)]),
     ]),
     group.tasks.length
       ? taskList(group.tasks, { showCourse: false })
@@ -247,5 +278,25 @@ async function toggleCompleted(task, checkbox) {
     handleError(error);
   } finally {
     checkbox.disabled = false;
+  }
+}
+
+// Bulk mark done / not done. Only tasks that would change are sent. Repeating tasks marked done
+// come back rolled forward to their next due date, as with a single completion.
+async function setCompleted(tasks, completed, button) {
+  const changing = tasks.filter((task) => task.completed !== completed);
+  if (changing.length === 0) return;
+  button.disabled = true;
+  try {
+    const updated = await updateTasks(changing.map(({ id }) => ({ id, completed })));
+    selected.clear();
+    update();
+    const rolled = completed && updated.some((task) => task.recurrence !== "none");
+    toast(`Marked ${updated.length} task${updated.length === 1 ? "" : "s"} ${completed ? "done" : "not done"}.`
+      + (rolled ? " Repeating tasks moved to their next due date." : ""));
+  } catch (error) {
+    handleError(error);
+  } finally {
+    button.disabled = false;
   }
 }

@@ -11,7 +11,8 @@ export function toast(message, kind = "info") {
   setTimeout(() => item.remove(), TOAST_MS);
 }
 
-// Banners are keyed by id, so the same state never shows twice.
+// Banners are keyed by id, so the same state never shows twice. Info banners are progress
+// notices removed by their owner; warnings and errors stay until acted on or dismissed.
 export function showBanner(id, message, { kind = "info", action } = {}) {
   hideBanner(id);
   bannerRegion.append(el("div", {
@@ -21,6 +22,12 @@ export function showBanner(id, message, { kind = "info", action } = {}) {
   }, [
     el("span", { className: "banner__message" }, message),
     action && el("button", { type: "button", className: "button button--small", onclick: action.onClick }, action.label),
+    kind !== "info" && el("button", {
+      type: "button",
+      className: "icon-button banner__dismiss",
+      "aria-label": "Dismiss",
+      onclick: () => hideBanner(id),
+    }, "×"),
   ]));
 }
 

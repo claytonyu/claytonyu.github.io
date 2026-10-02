@@ -11,9 +11,10 @@ function createInitialState() {
     tasksLoaded: false,
     canvasLoaded: false,
     syncing: false,
+    syncNeeded: true, // a new session starts unsynced; stays true after a failed sync
+    importView: { search: "" },
     lastSyncedAt: null,
     taskView: { layout: "list", sort: "due", courseSort: "name", showCompleted: false, search: "" },
-    importView: { search: "", showDecided: false },
   };
 }
 

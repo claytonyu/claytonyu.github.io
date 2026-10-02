@@ -24,10 +24,14 @@
       <p id="nav-user" class="app-nav__user"></p>
     </nav>
     <div class="app-main">
-      <div id="banners" class="banners"></div>
       <main id="view" class="view" tabindex="-1"></main>
     </div>
+    <!-- The task sidebar is inserted here, beside .app-main, when open. -->
   </div>
-  <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+  <!-- Floating notices at the bottom center: ongoing states (banners) above confirmations (toasts). -->
+  <div class="notices">
+    <div id="banners" class="banners"></div>
+    <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+  </div>
 </body>
 </html>

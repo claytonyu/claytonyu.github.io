@@ -33,6 +33,8 @@ Follow common convention for HTML and JS. Make sure you are writing safe and und
   - Allow the user to view their courses and tasks, and click them to edit/view in more detail. See more in below sections.
 - Task detail / edit
   - When a task is clicked, a sidebar on the right should appear. This is not a separate page.
+  - The sidebar sits beside the list, which narrows to make room. It doesn't overlay the page, gray it out or block clicks, so the rest of the app stays usable while it's open. On narrow screens it takes the full width, still without a backdrop.
+  - Opening another task (or a new one) while the sidebar has unsaved changes asks "Discard changes?" first; with no changes it switches straight away.
 - Canvas import
   - This page should allow the user to see new assignments to sync and show/ignore courses and assignments.
 - User Settings
@@ -63,7 +65,7 @@ Above all, make sure user data is never leaked and is safely handled by the fron
   - `404` — the item is gone or not the user's. Refresh the relevant list and show a brief "no longer available" notice rather than a hard error.
   - `502` — Canvas is unreachable. Show a retryable error, distinct from `400`, since the fix is "try again," not "fix your input."
 - Loading states needed: initial page load (cold start, see Canvas Import UI), task list fetch, any mutation in flight (disable the submit button to avoid double-submits on bulk endpoints).
-- Decided: both. Toasts for transient confirmations (task saved); banners for persistent states (sync in progress, server waking up, Canvas unreachable, Canvas token needed).
+- Decided: both, floating in one stack at the bottom center of the screen, layered over the page so nothing shifts. Toasts for transient confirmations (task saved). Banners for ongoing states: progress banners (sync in progress, server waking up) disappear on their own; warnings that need action (Canvas unreachable with Retry, Canvas token needed) stay until acted on or dismissed.
 
 ## Task List & Editing UI
 Layout of Task List Page:
@@ -75,9 +77,11 @@ Layout of Task List Page:
     - To show/hide completed tasks
 - Allow the user to search for tasks/courses. Build this as one shared search component/function (matches by name/title substring) reused by the Canvas Import search below, just pointed at a different data set (tasks/courses here, pending Canvas items there).
 - At the top of every task list — including when it's empty — show a "+ New Task" button that opens the task creation form (in the same sidebar used for editing).
+  - In bunched view, each course's list (including the dummy course) also has its own "+ New task" button, which opens the form with that course pre-filled.
+- When there are no tasks, show an empty state pointing to the Canvas Import page (with the number of new Canvas items waiting, if any).
 - Allow the user to delete and create tasks.
 - Completing a task: UI reflects the server's response for repeating tasks (due date moves forward, not deleted).
-- Bulk actions needed in UI (multi-select delete) if shift is held.
+- Bulk actions in UI if shift is held: multi-select, then delete, mark done, or mark not done (shown when any selected task is completed). Repeating tasks marked done roll forward as usual.
 Task Editing:
 - If a Canvas task, show relevant information (as described in the other companion md files), including a link to the Canvas assignment.
 - If not a Canvas task, show the same relevant information as above (unless not applicable). Allow the user to edit the task.
@@ -85,17 +89,18 @@ Task Editing:
 - Create/edit form fields and validation (title required, recurrence requires `due_at`, etc.).
 
 ## Canvas Import UI
-- Sync should be triggered upon page load, and have a manual button. Expect `POST /canvas/sync` to be slow (cold starts up to ~1 min), and display that somehow.
+- Sync should be triggered upon page load, and have a manual button. Expect `POST /canvas/sync` to be slow (cold starts up to ~1 min), and display that with a floating progress notice (see Error Handling & Loading States).
   - This button should be on both the Task List and Canvas Import page.
 - List of courses should appear
   - Allow the user to tick a checkbox to ignore/reveal a course again.
   - New courses should pop to the top and be highlighted yellow to draw attention, but allow the user to not take action.
 - List tasks underneath each course
-  - All previously chosen/ignored assignments should be hidden by default (maybe through a UI like the Mac folders), but give a checkbox.
-  - New courses should be highlighted yellow. Once decided, they should be hidden with the rest.
+  - All previously chosen/ignored assignments are collapsed by default in a per-course expand/collapse section (like Mac folders). Expanded, each has a checkbox to keep/ignore it, with normal (not highlighted) styling.
+  - New assignments should be highlighted yellow. Once decided, they move into the collapsed section with the rest.
+- Never scroll the page on the user's behalf (after a keep/ignore decision, or when assignments finish loading). A decided course may move out of the "new" group.
 - Allow for searching course or assignment by name. Same search implementation as the Task List search (see Task List & Editing UI), scoped to pending Canvas courses/assignments instead of tasks.
 - Loading/empty states for each step.
-- **Auto-sync on page change:** trigger `POST /canvas/sync` automatically whenever the user navigates to a page (not just once at app load), in addition to the manual button, so pending courses/assignments and the task list stay current as the user moves between views. Keeping a course/assignment immediately updates in-memory state (shared app-state module) so the Task List reflects it without a manual refresh.
+- **Sync only when needed:** changing pages triggers `POST /canvas/sync` only if a sync is needed: the session just started (sign-in, reconnect, or app opened), or the last sync failed. Keeping a course syncs right away, since that's the only way its assignments get fetched. Otherwise sync runs only from the manual button. Keeping a course/assignment immediately updates in-memory state (shared app-state module) so the Task List reflects it without a manual refresh.
 
 ## Data Fetching & State Management
 There should be a central API module or wrapper to modularize code (e.g. `api.js`): one function per endpoint, each handling the `Authorization` header, JSON parsing, and routing errors through the shared error handling above. Views call these functions and never call `fetch` directly.
@@ -109,7 +114,7 @@ Aesthetic should be clean but is standalone from the rest of claytonyu.github.io
 - Visual style: red accent color, dashboard-like layout (persistent nav/sidebar, data-dense list views, clear sections for courses/tasks), kept clean and minimalist — avoid heavy shadows/gradients/decoration, favor whitespace and typographic hierarchy over ornamentation.
   - Palette (shades of these are allowed): `#fff4ec` cream background, `#2e294e` navy text/nav, `#7698b3` steel blue secondary (borders, fills; darkened for text), `#cba328` gold for the "new item" highlight, `#c00d1f` red reserved for accents (primary actions, active nav item, due/overdue indicators) rather than large fill areas, so the dashboard stays legible and the red doesn't read as an error state everywhere.
   - Yellow is reserved for the "new item" highlight in Canvas Import, so it doesn't collide visually with the red accent/overdue treatment in the task list.
-- Accessibility requirements: keyboard nav for the task sidebar (open/close/focus trap) and the session-expiry modal, ARIA roles for the sidebar (`dialog`), the expiry modal (`alertdialog`), and course-ignore checkboxes, sufficient contrast for the yellow "new item" highlight against both its background and normal rows, and sufficient contrast for red accents against the background (plain red-on-white text can fail WCAG AA at small sizes, so prefer red for borders/icons/backgrounds-with-dark-text over red body text).
+- Accessibility requirements: keyboard nav for the task sidebar (non-modal, so no focus trap: focus moves into it on open, Escape closes it, focus returns to the task on close) and the session-expiry modal (focus trapped), ARIA roles for the sidebar (`dialog`), the expiry modal (`alertdialog`), and course-ignore checkboxes, sufficient contrast for the yellow "new item" highlight against both its background and normal rows, and sufficient contrast for red accents against the background (plain red-on-white text can fail WCAG AA at small sizes, so prefer red for borders/icons/backgrounds-with-dark-text over red body text).
 - Decided: one `styles.css` for now; split it if it grows unwieldy.
 
 ## Security Considerations (Frontend)

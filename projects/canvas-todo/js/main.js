@@ -4,7 +4,7 @@ import { hasSession, getToken, clearSession } from "./session.js";
 import { state, subscribe } from "./state.js";
 import { getHealth, setAuthHandlers } from "./api.js";
 import { loadMissingData } from "./actions.js";
-import { runSync, pendingCount } from "./canvas.js";
+import { syncIfNeeded, pendingCount } from "./canvas.js";
 import { handleError } from "./errors.js";
 import { expireSession } from "./auth.js";
 import { startExpiryWatch } from "./expiry.js";
@@ -16,7 +16,7 @@ import * as canvasImportView from "./views/canvasImport.js";
 import * as settingsView from "./views/settings.js";
 
 // Each view exports mount(root, route) and update(); update() runs after every state change.
-// "shell" views show the nav and auto-sync with Canvas when opened.
+// "shell" views show the nav, and sync with Canvas when opened if a sync is needed.
 const VIEWS = {
   login: { view: loginView, title: "Sign in", shell: false },
   reconnect: { view: loginView, title: "Reconnect Canvas", shell: false },
@@ -42,7 +42,7 @@ function onRouteChange() {
   showView(route);
   if (!signedIn) return;
   loadMissingData().catch((error) => handleError(error));
-  if (VIEWS[route.name].shell) runSync();
+  if (VIEWS[route.name].shell) syncIfNeeded();
 }
 
 // A token that's still in sessionStorage but past expires_at means the session ran out.
@@ -54,7 +54,9 @@ function redirectToLogin() {
 
 function showView(route) {
   const { view, title, shell } = VIEWS[route.name];
-  closeTaskSidebar();
+  // The sidebar is non-modal, so the nav stays clickable while editing. Keep it open across app
+  // pages rather than silently dropping unsaved edits; only leaving the app shell closes it.
+  if (!shell) closeTaskSidebar();
   activeView = view;
   document.title = `${title} · Canvas To-Do`;
   shellNav.hidden = !shell;
