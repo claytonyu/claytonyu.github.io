@@ -13,21 +13,25 @@ import { formatDateTime, isOverdue, completionMessage, RECURRENCE_LABELS } from 
 import { courseNameFor, filterTasks, sortTasks, groupTasks } from "../taskQuery.js";
 import { openTaskSidebar } from "./taskSidebar.js";
 import { confirmAndDeleteTasks } from "./confirmDelete.js";
+import { createSyncControl, refreshSyncControl } from "./syncButton.js";
 
 const selected = new Set(); // ids of tasks selected for bulk actions
-let refs = null; // { results, selectionBar, courseSortField }
+let refs = null; // { results, selectionBar, courseSortField, syncControl }
 
 export function mount(root) {
   selected.clear();
   refs = {
-    results: el("div", { className: "results", "aria-live": "polite", "aria-busy": "false" }),
+    // Not a live region: the whole list re-renders on each change. Toasts announce results instead.
+    results: el("div", { className: "results", "aria-busy": "false" }),
     selectionBar: el("div", { className: "selection-bar", hidden: true }),
     courseSortField: courseSortControl(),
+    syncControl: createSyncControl(),
   };
   root.append(
     el("header", { className: "view-header" }, [
       el("h1", { className: "view-title", tabIndex: -1 }, "Tasks"),
       el("div", { className: "view-header__actions" }, [
+        refs.syncControl,
         el("button", {
           type: "button",
           className: "button button--primary",
@@ -47,6 +51,7 @@ export function mount(root) {
 export function update() {
   const focusKey = focusKeyOf(document.activeElement);
   pruneSelection();
+  refreshSyncControl(refs.syncControl);
   refs.courseSortField.hidden = state.taskView.layout !== "grouped";
   refs.selectionBar.replaceChildren(...selectionBarContent());
   refs.selectionBar.hidden = selected.size === 0;

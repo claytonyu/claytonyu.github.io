@@ -51,8 +51,8 @@ Above all, make sure user data is never leaked and is safely handled by the fron
   - If this happened in response to a request the user actively triggered while mid-edit (e.g. saving a task in the sidebar), show a warning first ("your session has expired, your changes couldn't be saved") instead of redirecting out from under them silently.
   - Otherwise, clear local state and redirect to Login.
 - On `403` with `"error": "canvas_token_required"`: the session is still valid, only the PAT is bad/expired. Do **not** log the user out — show a "reconnect Canvas" prompt (likely the Login page's PAT form, but keeping the user's existing session) and resubmit to `POST /auth/token`.
-- Decide: does the redirect need a query param (e.g. `?reason=expired`) so Login can show a specific message, or is a generic "please log in" enough?
-- **Session expiry warning:** `POST /auth/token` returns `expires_at`. Track it client-side (e.g. alongside the token in `sessionStorage`) and, when the session is nearing `expires_at`, show a modal warning the user their session is about to end, with the approximate remaining time. Decide the lead time (e.g. warn at 5 minutes remaining) and the check mechanism (a periodic `setInterval` comparing `Date.now()` to `expires_at`, checked on page load and on an interval while the tab is open).
+- Decided: the redirect carries `?reason=expired|logged_out|disconnected|deleted`, and Login shows a message for each (plus a first-visit message when there's no reason).
+- **Session expiry warning:** `POST /auth/token` returns `expires_at`. Track it client-side (e.g. alongside the token in `sessionStorage`) and, when the session is nearing `expires_at`, show a modal warning the user their session is about to end, with the approximate remaining time. Decided: warn once at 5 minutes remaining; check on page load, every 30 seconds via `setInterval`, and when the tab becomes visible again. Once `expires_at` passes, the session ends as if it got a `401`.
 
 ## Error Handling & Loading States
 - Centralize response handling in the API module (see Data Fetching) so every call path gets consistent error behavior instead of each view re-implementing status checks.
@@ -63,7 +63,7 @@ Above all, make sure user data is never leaked and is safely handled by the fron
   - `404` — the item is gone or not the user's. Refresh the relevant list and show a brief "no longer available" notice rather than a hard error.
   - `502` — Canvas is unreachable. Show a retryable error, distinct from `400`, since the fix is "try again," not "fix your input."
 - Loading states needed: initial page load (cold start, see Canvas Import UI), task list fetch, any mutation in flight (disable the submit button to avoid double-submits on bulk endpoints).
-- Decide: toast/snackbar notifications, inline banners, or both? Toasts fit transient confirmations (task saved); banners fit persistent states (sync in progress, Canvas disconnected).
+- Decided: both. Toasts for transient confirmations (task saved); banners for persistent states (sync in progress, server waking up, Canvas unreachable, Canvas token needed).
 
 ## Task List & Editing UI
 Layout of Task List Page:
@@ -101,8 +101,8 @@ Task Editing:
 There should be a central API module or wrapper to modularize code (e.g. `api.js`): one function per endpoint, each handling the `Authorization` header, JSON parsing, and routing errors through the shared error handling above. Views call these functions and never call `fetch` directly.
 - State needed in memory: current user, task list (plus active filter/sort/search), pending courses/assignments from the last sync.
 - Refetch-after-mutation vs optimistic update: given the bulk-only, all-or-nothing API (BACKEND_IMPLEMENTATION.md section 2), the simplest correct approach is to use the server's response from each mutation to patch local state directly (`POST/PATCH /tasks` already return the updated `[Task]`), rather than refetching the whole list or guessing the result optimistically. This also matters for repeating tasks, where the server computes the new `due_at`.
-- Decide: a single global state object (e.g. a plain JS object + manual re-render calls) or per-view state? Given no framework, suggest one small app-state module that views read from and call `render()` after updates — avoids scattered DOM queries re-deriving state.
-- Decide: does the task list re-sort/filter client-side after local edits, or always reflect server order from the latest fetch?
+- Decided: one small app-state module (`js/state.js`). Mutations call `emit()`, and the active view's `update()` re-renders from state.
+- Decided: the task list filters and sorts client-side on every render, so local edits are placed correctly without refetching.
 
 ## Styling / Design
 Aesthetic should be clean but is standalone from the rest of claytonyu.github.io (own stylesheet, not a shared `styles.css`, similar to how `crossy-road/` is self-contained).
@@ -110,7 +110,7 @@ Aesthetic should be clean but is standalone from the rest of claytonyu.github.io
   - Palette (shades of these are allowed): `#fff4ec` cream background, `#2e294e` navy text/nav, `#7698b3` steel blue secondary (borders, fills; darkened for text), `#cba328` gold for the "new item" highlight, `#c00d1f` red reserved for accents (primary actions, active nav item, due/overdue indicators) rather than large fill areas, so the dashboard stays legible and the red doesn't read as an error state everywhere.
   - Yellow is reserved for the "new item" highlight in Canvas Import, so it doesn't collide visually with the red accent/overdue treatment in the task list.
 - Accessibility requirements: keyboard nav for the task sidebar (open/close/focus trap) and the session-expiry modal, ARIA roles for the sidebar (`dialog`), the expiry modal (`alertdialog`), and course-ignore checkboxes, sufficient contrast for the yellow "new item" highlight against both its background and normal rows, and sufficient contrast for red accents against the background (plain red-on-white text can fail WCAG AA at small sizes, so prefer red for borders/icons/backgrounds-with-dark-text over red body text).
-- Decide: single CSS file, or split per view/component as the app grows?
+- Decided: one `styles.css` for now; split it if it grows unwieldy.
 
 ## Security Considerations (Frontend)
 - Session token never written to `localStorage` or logs.
@@ -124,5 +124,4 @@ Aesthetic should be clean but is standalone from the rest of claytonyu.github.io
 - CORS is backend-enforced via `FRONTEND_URL`; the deployed origin (`https://<username>.github.io`) must exactly match what's configured on Render, or every request will fail at the browser level with no useful error from the backend's side. For local frontend testing, the local backend's `FRONTEND_URL` must likewise allow the local origin (e.g. `http://localhost:5500` or whatever serves the static files).
 
 ## Open Issues
-- Browser support target and offline behavior not yet specified.
-- Single vs. split CSS files not yet decided (reasonable to start with one file and split later if it grows unwieldy).
+- Browser support: the last two versions of Chrome, Firefox, Safari and Edge. No offline support.

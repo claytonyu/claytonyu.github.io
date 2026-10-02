@@ -13,7 +13,7 @@ function createInitialState() {
     syncing: false,
     lastSyncedAt: null,
     taskView: { layout: "list", sort: "due", courseSort: "name", showCompleted: false, search: "" },
-    importSearch: "",
+    importView: { search: "", showDecided: false },
   };
 }
 

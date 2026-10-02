@@ -4,24 +4,31 @@ import { hasSession, getToken, clearSession } from "./session.js";
 import { state, subscribe } from "./state.js";
 import { getHealth, setAuthHandlers } from "./api.js";
 import { loadMissingData } from "./actions.js";
+import { runSync, pendingCount } from "./canvas.js";
 import { handleError } from "./errors.js";
-import { endSession } from "./auth.js";
-import { openModal } from "./modal.js";
+import { expireSession } from "./auth.js";
+import { startExpiryWatch } from "./expiry.js";
 import { showBanner } from "./notify.js";
-import { closeTaskSidebar, isTaskSidebarDirty } from "./views/taskSidebar.js";
+import { closeTaskSidebar } from "./views/taskSidebar.js";
 import * as loginView from "./views/login.js";
 import * as taskListView from "./views/taskList.js";
+import * as canvasImportView from "./views/canvasImport.js";
+import * as settingsView from "./views/settings.js";
 
 // Each view exports mount(root, route) and update(); update() runs after every state change.
+// "shell" views show the nav and auto-sync with Canvas when opened.
 const VIEWS = {
   login: { view: loginView, title: "Sign in", shell: false },
   reconnect: { view: loginView, title: "Reconnect Canvas", shell: false },
   tasks: { view: taskListView, title: "Tasks", shell: true },
+  import: { view: canvasImportView, title: "Canvas Import", shell: true },
+  settings: { view: settingsView, title: "Settings", shell: true },
 };
 
 const viewRoot = document.getElementById("view");
 const shellNav = document.getElementById("app-nav");
 const userName = document.getElementById("nav-user");
+const pendingBadge = document.getElementById("nav-pending");
 let activeView = null;
 
 function onRouteChange() {
@@ -33,7 +40,9 @@ function onRouteChange() {
   if (!VIEWS[route.name]) return navigate("tasks");
 
   showView(route);
-  if (signedIn) loadMissingData().catch((error) => handleError(error));
+  if (!signedIn) return;
+  loadMissingData().catch((error) => handleError(error));
+  if (VIEWS[route.name].shell) runSync();
 }
 
 // A token that's still in sessionStorage but past expires_at means the session ran out.
@@ -61,27 +70,12 @@ function showView(route) {
 
 function renderShell() {
   userName.textContent = state.user?.name ?? "";
+  const pending = pendingCount();
+  pendingBadge.hidden = pending === 0;
+  pendingBadge.textContent = `${pending} new`;
 }
 
-// ----- Global auth handlers (called from api.js) -----
-
-let sessionEnding = false;
-
-async function onUnauthorized() {
-  if (sessionEnding) return;
-  sessionEnding = true;
-  // Don't yank the user out of the sidebar silently: tell them their edit was lost first.
-  if (isTaskSidebarDirty()) {
-    await openModal({
-      title: "Your session has expired",
-      message: "Your changes couldn't be saved. Sign in again to continue.",
-      confirmLabel: "Sign in",
-    });
-  }
-  endSession("expired");
-  sessionEnding = false;
-}
-
+// 403 canvas_token_required: the session is fine, only the stored PAT is bad. Don't log out.
 function onCanvasTokenRequired() {
   showBanner("canvas-token", "Canvas no longer accepts your saved access token. You're still signed in.", {
     kind: "warning",
@@ -89,7 +83,7 @@ function onCanvasTokenRequired() {
   });
 }
 
-setAuthHandlers({ onUnauthorized, onCanvasTokenRequired });
+setAuthHandlers({ onUnauthorized: expireSession, onCanvasTokenRequired });
 subscribe(() => {
   renderShell();
   activeView?.update();
@@ -100,3 +94,4 @@ document.getElementById("skip-link").addEventListener("click", () => viewRoot.fo
 // Wake the (possibly sleeping) Render service early. Failures surface on the real requests.
 getHealth().catch(() => {});
 onRouteChange();
+startExpiryWatch();

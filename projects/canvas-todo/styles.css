@@ -15,6 +15,7 @@
   --steel-text: #456580;   /* darkened steel for small text on cream (≈5.4:1) */
   --gold: #cba328;
   --gold-pale: #f7ebc2;    /* "new item" background; navy text on it ≈ 11:1 */
+  --gold-dark: #9a7a12;    /* "new item" edge, ≥3:1 against both the highlight and normal rows */
   --red: #c00d1f;          /* ≈ 5.9:1 on cream, 6.5:1 under white text */
   --red-dark: #9a0a19;
   --red-pale: #fbe3e5;
@@ -147,7 +148,7 @@ input[type="checkbox"] { width: 1.1rem; height: 1.1rem; margin: 0; accent-color:
   border: 1px solid var(--steel); font-size: 0.75rem; font-weight: 600; color: var(--steel-text); background: var(--surface);
 }
 .badge--canvas { border-color: var(--navy); background: var(--navy); color: var(--cream); }
-.badge--new { border-color: var(--gold); background: var(--gold-pale); color: var(--navy); }
+.badge--new { border-color: var(--gold-dark); background: var(--gold-pale); color: var(--navy); }
 
 /* ----- Toolbar, lists ----- */
 
@@ -266,6 +267,63 @@ input[type="checkbox"] { width: 1.1rem; height: 1.1rem; margin: 0; accent-color:
 .login__actions { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
 .login__status { font-size: 0.875rem; color: var(--steel-text); }
 .login__status:empty { display: none; }
+
+/* ----- Nav badge, sync control ----- */
+
+.nav-badge {
+  margin-left: auto; padding: 0 var(--space-2); border-radius: 999px;
+  background: var(--gold-pale); color: var(--navy); font-size: 0.75rem; font-weight: 700;
+}
+.sync-control { display: flex; align-items: center; gap: var(--space-3); }
+.sync-control__status { font-size: 0.8rem; color: var(--steel-text); }
+.button[aria-disabled="true"] { opacity: 0.65; cursor: progress; }
+
+/* ----- Canvas Import ----- */
+
+.import-course { border: 1px solid var(--steel-light); border-radius: var(--radius); background: var(--surface); }
+.import-course__header {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4); border-left: 4px solid transparent; border-radius: var(--radius) var(--radius) 0 0;
+}
+.import-course__title { display: flex; align-items: center; gap: var(--space-2); font-size: 1.05rem; font-weight: 650; }
+.import-course__title:focus-visible { box-shadow: var(--focus); }
+.import-course__body { border-top: 1px solid var(--steel-light); }
+.import-course__note { padding: var(--space-2) var(--space-4) var(--space-3); font-size: 0.9rem; color: var(--steel-text); }
+.import-course__body .import-course__note { padding-top: var(--space-2); }
+
+/* Gold "new item" highlight: pale gold fill + gold edge, navy text, plus a "New" badge so it isn't color-only. */
+.is-new { background: var(--gold-pale); border-left-color: var(--gold-dark); }
+
+.decision { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.decision--bulk { padding: var(--space-2) var(--space-4); border-bottom: 1px solid var(--steel-light); font-size: 0.875rem; font-weight: 600; }
+
+.assignment-list { list-style: none; margin: 0; padding: 0; }
+.assignment-row {
+  display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--steel-light); border-left: 4px solid transparent;
+}
+.assignment-row:last-child { border-bottom: 0; }
+.assignment-row__info { flex: 1; min-width: 0; display: flex; flex-direction: column; cursor: pointer; }
+.assignment-row.is-new .assignment-row__info { cursor: default; }
+.assignment-row__name { font-weight: 550; overflow-wrap: anywhere; }
+.assignment-row__meta { font-size: 0.8rem; color: var(--steel-text); }
+.assignment-row.is-new .assignment-row__meta { color: var(--navy-soft); }
+
+/* ----- Settings ----- */
+
+.panel {
+  max-width: 48rem; padding: var(--space-6); margin-bottom: var(--space-6);
+  border: 1px solid var(--steel-light); border-radius: var(--radius); background: var(--surface);
+}
+.info-list { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-2) var(--space-6); margin: 0; }
+.info-list dt { font-weight: 600; }
+.info-list dd { margin: 0; overflow-wrap: anywhere; }
+.action-row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-6);
+  padding: var(--space-4) 0; border-top: 1px solid var(--steel-light);
+}
+.action-row .button { flex-shrink: 0; min-width: 10rem; }
+@media (max-width: 36rem) { .action-row { flex-direction: column; align-items: flex-start; } }
 
 @media (prefers-reduced-motion: no-preference) {
   .toast { animation: toast-in 150ms ease-out; }
