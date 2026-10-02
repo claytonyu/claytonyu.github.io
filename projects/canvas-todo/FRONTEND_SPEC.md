@@ -107,7 +107,7 @@ There should be a central API module or wrapper to modularize code (e.g. `api.js
 ## Styling / Design
 Aesthetic should be clean but is standalone from the rest of claytonyu.github.io (own stylesheet, not a shared `styles.css`, similar to how `crossy-road/` is self-contained).
 - Visual style: red accent color, dashboard-like layout (persistent nav/sidebar, data-dense list views, clear sections for courses/tasks), kept clean and minimalist — avoid heavy shadows/gradients/decoration, favor whitespace and typographic hierarchy over ornamentation.
-  - Suggested palette direction: a muted off-white/light-gray background, dark neutral text, and red reserved for accents (primary actions, active nav item, due/overdue indicators) rather than large fill areas, so the dashboard stays legible and the red doesn't read as an error state everywhere.
+  - Palette (shades of these are allowed): `#fff4ec` cream background, `#2e294e` navy text/nav, `#7698b3` steel blue secondary (borders, fills; darkened for text), `#cba328` gold for the "new item" highlight, `#c00d1f` red reserved for accents (primary actions, active nav item, due/overdue indicators) rather than large fill areas, so the dashboard stays legible and the red doesn't read as an error state everywhere.
   - Yellow is reserved for the "new item" highlight in Canvas Import, so it doesn't collide visually with the red accent/overdue treatment in the task list.
 - Accessibility requirements: keyboard nav for the task sidebar (open/close/focus trap) and the session-expiry modal, ARIA roles for the sidebar (`dialog`), the expiry modal (`alertdialog`), and course-ignore checkboxes, sufficient contrast for the yellow "new item" highlight against both its background and normal rows, and sufficient contrast for red accents against the background (plain red-on-white text can fail WCAG AA at small sizes, so prefer red for borders/icons/backgrounds-with-dark-text over red body text).
 - Decide: single CSS file, or split per view/component as the app grows?
@@ -125,5 +125,4 @@ Aesthetic should be clean but is standalone from the rest of claytonyu.github.io
 
 ## Open Issues
 - Browser support target and offline behavior not yet specified.
-- Exact red/neutral palette values (hex codes) not yet chosen — direction only, see Styling / Design.
 - Single vs. split CSS files not yet decided (reasonable to start with one file and split later if it grows unwieldy).

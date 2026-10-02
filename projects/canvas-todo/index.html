@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- connect-src must list the backend URLs from js/config.js. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src https://one5113-hw4-backend.onrender.com http://localhost:8080; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Canvas To-Do</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <!-- A button, not an href="#view" link, because the hash is used for routing. -->
+  <button type="button" id="skip-link" class="skip-link">Skip to content</button>
+  <div class="app">
+    <nav id="app-nav" class="app-nav" aria-label="Main" hidden>
+      <p class="app-nav__brand">Canvas To-Do</p>
+      <ul class="app-nav__links">
+        <li><a href="#/tasks" data-route="tasks">Tasks</a></li>
+        <li><a href="#/import" data-route="import">Canvas Import</a></li>
+        <li><a href="#/settings" data-route="settings">Settings</a></li>
+      </ul>
+      <p id="nav-user" class="app-nav__user"></p>
+    </nav>
+    <div class="app-main">
+      <div id="banners" class="banners"></div>
+      <main id="view" class="view" tabindex="-1"></main>
+    </div>
+  </div>
+  <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+</body>
+</html>
