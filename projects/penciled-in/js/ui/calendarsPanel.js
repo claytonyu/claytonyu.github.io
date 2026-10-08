@@ -1,6 +1,7 @@
 // Google calendars: choose which ones block your time, optional padding per calendar,
 // and the list of events you chose to ignore. Logged-in users only.
-import { clear, h } from '../dom.js';
+import { refetchEventsSoon } from '../actions.js';
+import { clear, h, keepFocus } from '../dom.js';
 import { restoreDismissals, setCalendar, state, subscribe } from '../store.js';
 import { fmtInstant } from '../time.js';
 
@@ -17,7 +18,7 @@ export function mountCalendars(root) {
     ),
     h('p', {
       class: 'hint',
-      text: 'Events from checked calendars count as unavailable time. After checking a new calendar, press Refresh Google to load its events.',
+      text: 'Events from checked calendars count as unavailable time. Checking a new calendar loads its events automatically.',
     }),
     calendarEmpty,
     calendarList,
@@ -35,7 +36,11 @@ export function mountCalendars(root) {
         type: 'checkbox',
         id: checkId,
         checked: !!cal.selected,
-        onchange: (e) => setCalendar(cal.id, { selected: e.target.checked }),
+        onchange: (e) => {
+          setCalendar(cal.id, { selected: e.target.checked });
+          // A newly selected calendar has no events loaded yet; fetch them (debounced).
+          if (e.target.checked) refetchEventsSoon();
+        },
       });
       const pad = h('input', {
         type: 'number',
@@ -68,7 +73,15 @@ export function mountCalendars(root) {
     }
   };
 
-  const renderDismissed = () => {
+  // The empty box shows the global padding as its placeholder, which can change at any time
+  // without the calendar list being rebuilt.
+  const updatePlaceholders = () => {
+    for (const input of calendarList.querySelectorAll('.pad-override input')) {
+      input.placeholder = String(state.settings.padding_min);
+    }
+  };
+
+  const buildDismissed = () => {
     clear(dismissedWrap);
     if (!state.dismissed.length) return;
     const tz = state.settings.timezone;
@@ -101,6 +114,7 @@ export function mountCalendars(root) {
               type: 'button',
               text: 'Restore',
               'aria-label': `Restore ${label}`,
+              dataset: { focusKey: `restore-${d.id}` },
               onclick: () => restoreDismissals([d.id]),
             }),
           ),
@@ -110,7 +124,11 @@ export function mountCalendars(root) {
     dismissedWrap.append(ul);
   };
 
+  // Focus falls back to the panel itself when the restored item disappears from the list.
+  const renderDismissed = () => keepFocus(dismissedWrap, buildDismissed, root);
+
   subscribe(['calendars-ext', 'auth'], renderCalendars);
+  subscribe(['data'], updatePlaceholders);
   subscribe(['data', 'auth'], renderDismissed);
   renderCalendars();
   renderDismissed();

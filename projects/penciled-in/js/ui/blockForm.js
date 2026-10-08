@@ -1,5 +1,5 @@
 import { field, h } from '../dom.js';
-import { buildRule, parseRule, WEEKDAY_LABELS } from '../rrule.js';
+import { buildRule, parseRule, untilDay, WEEKDAY_LABELS } from '../rrule.js';
 import { addBlock, state, updateBlock } from '../store.js';
 import {
   DAY_MIN,
@@ -53,7 +53,8 @@ export function openBlockForm(block = null) {
   );
   const daysRow = h('fieldset', { class: 'field' }, h('legend', { text: 'Repeat on' }), h('div', { class: 'chips' }, dayBoxes));
 
-  const endsKind = rule ? (rule.until && rule.until.kind === 'day' ? 'until' : rule.count !== null ? 'count' : 'never') : 'never';
+  const ruleLastDay = untilDay(rule, tz);
+  const endsKind = rule ? (ruleLastDay !== null ? 'until' : rule.count !== null ? 'count' : 'never') : 'never';
   const ends = h(
     'select',
     { value: endsKind },
@@ -63,7 +64,7 @@ export function openBlockForm(block = null) {
   );
   const untilInput = h('input', {
     type: 'date',
-    value: rule && rule.until && rule.until.kind === 'day' ? toInputDate(rule.until.day) : toInputDate(dayOfWall(utcToWall(startMs, tz)) + 84),
+    value: toInputDate(ruleLastDay !== null ? ruleLastDay : dayOfWall(utcToWall(startMs, tz)) + 84),
   });
   const countInput = h('input', { type: 'number', min: 1, max: 3660, step: 1, inputMode: 'numeric', value: String(rule && rule.count !== null ? rule.count : 10) });
 

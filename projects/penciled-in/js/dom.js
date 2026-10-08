@@ -44,6 +44,32 @@ export function clear(el) {
   return el;
 }
 
+// Make `container` hold `nextNodes`, touching only the children that actually differ.
+// Used for aria-live regions: rebuilding every child on each render makes screen readers
+// announce the whole region again, so unchanged children are left alone.
+// Click handlers on kept children are the old ones, so they must not depend on render-time
+// values that can change while the visible content stays the same.
+export function syncChildren(container, nextNodes) {
+  nextNodes.forEach((node, i) => {
+    const current = container.childNodes[i];
+    if (!current) container.appendChild(node);
+    else if (!current.isEqualNode(node)) container.replaceChild(node, current);
+  });
+  while (container.childNodes.length > nextNodes.length) container.lastChild.remove();
+}
+
+// Rebuild a list but keep keyboard focus on the same control. Controls opt in with
+// dataset.focusKey. If the focused control no longer exists (say it was deleted), focus
+// moves to `fallback` instead of being dropped to the page.
+export function keepFocus(container, rebuild, fallback = null) {
+  const active = document.activeElement;
+  const key = active && container.contains(active) ? active.dataset.focusKey : null;
+  rebuild();
+  if (!key) return;
+  const again = [...container.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === key);
+  (again || fallback)?.focus();
+}
+
 // A label + control (+ optional hint) row used by all forms.
 export function field(id, labelText, control, hint) {
   control.id = id;

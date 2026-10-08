@@ -1,11 +1,28 @@
-// Top-right account area. The title and tagline are static markup in index.html.
-import { deleteAccount, login, logout } from '../actions.js';
+// Top-right area: the account menu, and the Refresh Google button sitting directly above
+// the Generate button. The title is static markup in index.html.
+import { deleteAccount, login, logout, refreshGoogle } from '../actions.js';
 import { describeError } from '../api.js';
 import { clear, h } from '../dom.js';
 import { notify, state, subscribe } from '../store.js';
 import { confirmDialog } from './modal.js';
 
-export function mountTopbar(root) {
+export function mountTopbar(root, refreshRoot) {
+  const refreshBtn = h('button', { class: 'btn', type: 'button', onclick: refreshGoogle });
+  refreshRoot.append(refreshBtn);
+
+  // Only meaningful when logged in and the server has Google set up for this account.
+  const renderRefresh = () => {
+    const show = state.mode === 'user' && state.googleError !== 'not_connected' && state.googleError !== 'not_configured';
+    refreshRoot.hidden = !show;
+    refreshBtn.disabled = state.busy.refreshing || state.loading;
+    refreshBtn.textContent = state.busy.refreshing ? 'Refreshing…' : 'Refresh Google';
+    const loaded = state.events.filter((ev) => {
+      const cal = state.calendars.find((c) => c.id === ev.calendar_id);
+      return !cal || cal.selected;
+    }).length;
+    refreshBtn.title = `Reload your Google calendars and events (${loaded} loaded)`;
+  };
+
   const render = () => {
     clear(root);
     if (state.mode === 'guest') {
@@ -76,5 +93,7 @@ export function mountTopbar(root) {
   });
 
   subscribe(['auth'], render);
+  subscribe(['auth', 'status', 'data'], renderRefresh);
   render();
+  renderRefresh();
 }

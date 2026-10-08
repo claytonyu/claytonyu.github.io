@@ -1,11 +1,11 @@
 // Right-hand panel: everything about generating. Generate button, the settings that feed it,
 // what came out of it, Google refresh, and export.
 import { generate, login, refreshGoogle } from '../actions.js';
-import { clear, h } from '../dom.js';
+import { clear, h, syncChildren } from '../dom.js';
 import { chunkIssues, chunkLabel, describeIssues } from '../issues.js';
 import { downloadIcs } from '../ics.js';
 import { clearNotice, setFocusDay, setSettings, state, subscribe } from '../store.js';
-import { dayOfWall, fmtDuration, fmtInstant, utcToWall } from '../time.js';
+import { dayOfWall, fmtDuration, fmtInstant, fmtMonthDay, utcToWall } from '../time.js';
 import { plural } from '../util.js';
 import { showCalendarPane } from './tasksPanel.js';
 
@@ -112,13 +112,12 @@ export function mountPlan(root) {
   const exportHint = h('p', { class: 'hint', text: 'Tasks only. Your blocks and Google events are not included.' });
 
   // ---- Google + sync ----
-  const googleBtn = h('button', { class: 'btn', type: 'button', text: 'Refresh Google', onclick: refreshGoogle });
+  // The Refresh Google button itself lives in the top bar, above Generate.
   const googleInfo = h('p', { class: 'hint' });
   const googleSection = h(
     'section',
     { class: 'plan-section', 'aria-labelledby': 'plan-google-h' },
     h('h2', { id: 'plan-google-h', class: 'plan-h', text: 'Google Calendar' }),
-    googleBtn,
     googleInfo,
   );
   const syncLine = h('p', { class: 'sync-line' });
@@ -151,21 +150,32 @@ export function mountPlan(root) {
     genHint.classList.toggle('stale', state.inputsChanged && !!planned);
   };
 
-  const noticeEl = (n, dismissible) =>
-    h(
+  const noticeEl = (n, dismissible) => {
+    // Stored notices are looked up when clicked: syncChildren keeps unchanged buttons, which
+    // must run the current action rather than one captured by an earlier render.
+    const run = () => {
+      const live = dismissible ? state.notices.find((x) => x.id === n.id) : n;
+      if (live && live.action) live.action.run();
+    };
+    return h(
       'div',
-      { class: `notice notice-${n.kind}`, role: n.kind === 'error' ? 'alert' : null },
+      {
+        class: `notice notice-${n.kind}`,
+        role: n.kind === 'error' ? 'alert' : null,
+        dataset: dismissible ? { noticeId: n.id } : null, // keeps notices with equal text distinct
+      },
       h('p', { text: n.text }),
       h(
         'div',
         { class: 'notice-actions' },
-        n.action ? h('button', { class: 'btn btn-sm', type: 'button', text: n.action.label, onclick: n.action.run }) : null,
+        n.action ? h('button', { class: 'btn btn-sm', type: 'button', text: n.action.label, onclick: run }) : null,
         dismissible ? h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Dismiss', text: '×', onclick: () => clearNotice(n.id) }) : null,
       ),
     );
+  };
 
+  // Diffed into the live region: re-creating an unchanged role="alert" would announce it again.
   const renderNotices = () => {
-    clear(notices);
     const derived = [];
     if (state.loading) derived.push({ kind: 'info', text: 'Loading your data…' });
     if (state.busy.waking) {
@@ -189,26 +199,35 @@ export function mountPlan(root) {
     if (state.result && state.result.googleError && state.result.googleError !== state.googleError) {
       derived.push({ kind: 'warn', text: 'This plan was made without some Google events, so it may conflict with your calendar.' });
     }
-    for (const n of derived) notices.append(noticeEl(n, false));
-    for (const n of state.notices) notices.append(noticeEl(n, true));
+    syncChildren(notices, [...derived.map((n) => noticeEl(n, false)), ...state.notices.map((n) => noticeEl(n, true))]);
   };
 
-  const jumpToChunk = (chunk) => {
+  // Looks the chunk up when clicked: a kept (unchanged) button must not point at a stale object.
+  const jumpToChunk = (chunkId) => {
+    const chunk = state.chunks.find((c) => c.id === chunkId);
+    if (!chunk) return;
     setFocusDay(dayOfWall(utcToWall(Date.parse(chunk.start), state.settings.timezone)));
     showCalendarPane();
   };
 
+  // Built as a list of nodes and diffed into the live region, so an unrelated re-render
+  // doesn't make screen readers read every result again.
   const renderResults = () => {
-    clear(results);
+    const nodes = [];
+    buildResults(nodes);
+    syncChildren(results, nodes);
+  };
+
+  const buildResults = (out) => {
     const r = state.result;
     const issues = chunkIssues(state);
     const tz = state.settings.timezone;
     if (!r && issues.size === 0) {
-      results.append(h('p', { class: 'empty', text: 'Add tasks and press Generate. Anything that cannot fit will be listed here, along with how much time is missing.' }));
+      out.push(h('p', { class: 'empty', text: 'Add tasks and press Generate. Anything that cannot fit will be listed here, along with how much time is missing.' }));
       return;
     }
     if (r) {
-      results.append(
+      out.push(
         h('p', {
           class: 'summary',
           text: r.placed
@@ -220,7 +239,7 @@ export function mountPlan(root) {
       const short = r.unschedulable.filter((u) => tasks.has(u.task_id));
       if (short.length) {
         const passed = new Set(r.warnings.filter((w) => w.code === 'deadline_passed').map((w) => w.task_id));
-        results.append(h('h3', { class: 'subhead bad', text: `Can't fit (${short.length})` }));
+        out.push(h('h3', { class: 'subhead bad', text: `Can't fit (${short.length})` }));
         const ul = h('ul', { class: 'result-list' });
         for (const u of short) {
           const t = tasks.get(u.task_id);
@@ -234,18 +253,18 @@ export function mountPlan(root) {
             ),
           );
         }
-        results.append(ul);
+        out.push(ul);
       }
       const warnings = r.warnings.filter((w) => !HANDLED_CODES.has(w.code) && w.code !== 'deadline_passed');
       if (warnings.length) {
-        results.append(h('h3', { class: 'subhead warn', text: `Warnings (${warnings.length})` }));
+        out.push(h('h3', { class: 'subhead warn', text: `Warnings (${warnings.length})` }));
         const ul = h('ul', { class: 'result-list' });
         for (const w of warnings) ul.append(h('li', { text: w.message }));
-        results.append(ul);
+        out.push(ul);
       }
     }
     if (issues.size) {
-      results.append(h('h3', { class: 'subhead warn', text: `Heads up (${issues.size})` }));
+      out.push(h('h3', { class: 'subhead warn', text: `Heads up (${issues.size})` }));
       const ul = h('ul', { class: 'result-list' });
       for (const [id, issue] of issues) {
         const chunk = state.chunks.find((c) => c.id === id);
@@ -254,12 +273,12 @@ export function mountPlan(root) {
           h(
             'li',
             {},
-            h('button', { class: 'link', type: 'button', text: chunkLabel(state, chunk), onclick: () => jumpToChunk(chunk) }),
+            h('button', { class: 'link', type: 'button', text: chunkLabel(state, chunk), onclick: () => jumpToChunk(id) }),
             h('span', { class: 'sub', text: `This ${describeIssues(issue)}.` }),
           ),
         );
       }
-      results.append(ul);
+      out.push(ul);
     }
   };
 
@@ -270,13 +289,21 @@ export function mountPlan(root) {
   const renderGoogle = () => {
     const show = state.mode === 'user' && state.googleError !== 'not_connected' && state.googleError !== 'not_configured';
     googleSection.hidden = !show;
-    googleBtn.disabled = state.busy.refreshing || state.loading;
-    googleBtn.textContent = state.busy.refreshing ? 'Refreshing…' : 'Refresh Google';
-    const visible = state.events.filter((ev) => {
+    const loaded = state.events.filter((ev) => {
       const cal = state.calendars.find((c) => c.id === ev.calendar_id);
       return !cal || cal.selected;
-    }).length;
-    googleInfo.textContent = `${plural(visible, 'event')} loaded from your selected calendars. Events are also fetched each time you generate.`;
+    });
+    // Show the date range the app actually holds, so "events are missing" can be traced to
+    // either the data (range is short) or the view (range is long, but you're on another week).
+    let range = '';
+    if (loaded.length) {
+      const tz = state.settings.timezone;
+      const starts = loaded.map((ev) => Date.parse(ev.start)).filter(Number.isFinite);
+      const first = dayOfWall(utcToWall(Math.min(...starts), tz));
+      const last = dayOfWall(utcToWall(Math.max(...starts), tz));
+      range = first === last ? ` on ${fmtMonthDay(first)}` : ` from ${fmtMonthDay(first)} to ${fmtMonthDay(last)}`;
+    }
+    googleInfo.textContent = `${plural(loaded.length, 'event')} loaded${range}. Use Refresh Google at the top to reload them. Events are also fetched each time you generate.`;
   };
 
   const renderSync = () => {

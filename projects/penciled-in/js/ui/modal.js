@@ -4,6 +4,8 @@ import { clear, h } from '../dom.js';
 
 let closeCallback = null;
 let pointerDownOnBackdrop = false;
+let opener = null; // what had focus before the dialog opened
+let openerKey = null; // its data-focus-key, to find the rebuilt copy if the list re-rendered
 
 export function setupModal() {
   const dlg = document.getElementById('modal');
@@ -25,11 +27,29 @@ function finish(dlg) {
   clear(dlg);
   const cb = closeCallback;
   closeCallback = null;
+  // <dialog> returns focus to the opener, but a list that re-rendered while the dialog was
+  // open has replaced that button. Find its new copy by key.
+  if (opener && !opener.isConnected && openerKey) {
+    [...document.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === openerKey)?.focus();
+  }
+  opener = null;
+  openerKey = null;
   if (cb) cb();
 }
 
 export function openModal({ title, content, wide = false, onClose = null }) {
   const dlg = document.getElementById('modal');
+  // Replacing a dialog that is still open: tell its owner it was dismissed, or a pending
+  // confirmDialog() promise would never settle.
+  if (closeCallback) {
+    const previous = closeCallback;
+    closeCallback = null;
+    previous();
+  }
+  if (!dlg.open) {
+    opener = document.activeElement;
+    openerKey = opener && opener.dataset ? opener.dataset.focusKey || null : null;
+  }
   clear(dlg);
   dlg.classList.toggle('wide', wide);
   dlg.setAttribute('aria-labelledby', 'modal-title');

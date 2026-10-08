@@ -1,5 +1,5 @@
 import { login } from '../actions.js';
-import { clear, h } from '../dom.js';
+import { clear, h, keepFocus } from '../dom.js';
 import { describeRule } from '../rrule.js';
 import { deleteBlock, setFocusDay, state, subscribe } from '../store.js';
 import { DAY_MIN, dayOfWall, fmtClock, fmtDayLong, fmtWall, utcToWall } from '../time.js';
@@ -25,19 +25,15 @@ export function mountBlocks(root) {
     h('p', { text: 'Log in with Google to also avoid events from your Google calendars.' }),
     h('button', { class: 'btn btn-sm', type: 'button', text: 'Log in with Google', onclick: login }),
   );
+  const addBtn = h('button', { class: 'btn btn-sm btn-primary', type: 'button', text: '+ Add block', onclick: () => openBlockForm() });
   root.append(
-    h(
-      'div',
-      { class: 'panel-head' },
-      h('p', { class: 'panel-sub', text: 'When you are not free' }),
-      h('button', { class: 'btn btn-sm btn-primary', type: 'button', text: '+ Add block', onclick: () => openBlockForm() }),
-    ),
+    h('div', { class: 'panel-head' }, h('p', { class: 'panel-sub', text: 'When you are not free' }), addBtn),
     empty,
     list,
     guestHint,
   );
 
-  const render = () => {
+  const build = () => {
     const tz = state.settings.timezone;
     clear(list);
     guestHint.hidden = state.mode !== 'guest';
@@ -62,23 +58,32 @@ export function mountBlocks(root) {
               type: 'button',
               title: 'Show on calendar',
               text: name,
+              dataset: { focusKey: `block-title-${b.id}` },
               onclick: () => {
                 setFocusDay(dayOfWall(utcToWall(Date.parse(b.start), tz)));
                 showCalendarPane();
               },
             }),
             h('div', { class: 'item-meta', text: whenText(b, tz) }),
-            b.rrule ? h('div', { class: 'item-meta', text: describeRule(b.rrule) }) : null,
+            b.rrule ? h('div', { class: 'item-meta', text: describeRule(b.rrule, tz) }) : null,
           ),
           h(
             'div',
             { class: 'item-actions' },
-            h('button', { class: 'btn btn-sm', type: 'button', text: 'Edit', 'aria-label': `Edit ${name}`, onclick: () => openBlockForm(b) }),
+            h('button', {
+              class: 'btn btn-sm',
+              type: 'button',
+              text: 'Edit',
+              'aria-label': `Edit ${name}`,
+              dataset: { focusKey: `block-edit-${b.id}` },
+              onclick: () => openBlockForm(b),
+            }),
             h('button', {
               class: 'btn btn-sm btn-ghost',
               type: 'button',
               text: 'Delete',
               'aria-label': `Delete ${name}`,
+              dataset: { focusKey: `block-delete-${b.id}` },
               onclick: async () => {
                 const { ok } = await confirmDialog({
                   title: 'Delete this block?',
@@ -95,6 +100,7 @@ export function mountBlocks(root) {
     }
   };
 
+  const render = () => keepFocus(list, build, addBtn);
   subscribe(['data', 'auth'], render);
   render();
 }

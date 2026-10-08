@@ -3,12 +3,14 @@
 //
 // Chunks: click = toggle lock. Drag = move, bottom edge = resize (both snap to 15 minutes and lock).
 // Keyboard: Enter/Space toggles lock, arrows move, Shift+arrows resize, Delete removes.
+import { isLoadingEventsForView } from '../actions.js';
 import { GRID_MIN } from '../config.js';
 import { busyItems } from '../busy.js';
 import { clear, h } from '../dom.js';
 import { chunkIssues, describeIssues } from '../issues.js';
 import {
   deleteChunk,
+  eventsCoverView,
   goToday,
   setViewMode,
   shiftView,
@@ -44,6 +46,7 @@ const px = (n) => `${n}px`;
 
 let scroller;
 let titleEl;
+let loadingEl;
 let dayBtn;
 let weekBtn;
 let bodyEl = null;
@@ -57,6 +60,7 @@ export function mountCalendar(root) {
   if (window.matchMedia('(max-width: 900px)').matches) state.view.mode = 'day';
 
   titleEl = h('h2', { class: 'cal-title', 'aria-live': 'polite' });
+  loadingEl = h('span', { class: 'cal-loading', role: 'status' });
   dayBtn = h('button', { class: 'seg-btn', type: 'button', text: 'Day', onclick: () => setViewMode('day') });
   weekBtn = h('button', { class: 'seg-btn', type: 'button', text: 'Week', onclick: () => setViewMode('week') });
   scroller = h('div', { class: 'cal-scroll' });
@@ -74,6 +78,7 @@ export function mountCalendar(root) {
         h('button', { class: 'btn btn-sm', type: 'button', 'aria-label': 'Next', text: '›', onclick: () => shiftView(1) }),
       ),
       titleEl,
+      loadingEl,
       h('div', { class: 'seg', role: 'group', 'aria-label': 'Calendar view' }, dayBtn, weekBtn),
     ),
     scroller,
@@ -94,8 +99,21 @@ export function mountCalendar(root) {
   );
 
   subscribe(['data', 'view', 'auth'], render);
+  subscribe(['status', 'view', 'auth'], updateLoadingLabel);
   setInterval(tickNow, 60000);
   render();
+  updateLoadingLabel();
+}
+
+// Shown only when the days on screen are outside the loaded event window, i.e. when events
+// for this view may be missing. Fetches that merely prefetch ahead stay silent.
+function updateLoadingLabel() {
+  let text = '';
+  if (state.mode === 'user' && !state.loading && state.calendars.some((c) => c.selected) && !eventsCoverView(0)) {
+    if (state.eventsFailed) text = 'Events not loaded for these dates';
+    else if (isLoadingEventsForView()) text = 'Loading events…';
+  }
+  if (loadingEl.textContent !== text) loadingEl.textContent = text;
 }
 
 // ---- Geometry helpers ----

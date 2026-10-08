@@ -1,8 +1,8 @@
-import { enterUserMode, handleUnauthorized, loadState } from './actions.js';
+import { ensureEventsForView, enterUserMode, handleUnauthorized, loadState } from './actions.js';
 import * as api from './api.js';
 import { consumeHash, getToken, loginErrorMessage, setToken } from './auth.js';
 import * as sync from './sync.js';
-import { emit, enterGuestState, notify, state } from './store.js';
+import { emit, enterGuestState, notify, state, subscribe } from './store.js';
 import { mountCalendar } from './ui/calendarView.js';
 import { mountInputs } from './ui/inputs.js';
 import { mountMobileNav } from './ui/mobileNav.js';
@@ -62,7 +62,7 @@ async function init() {
   setupModal();
   wire();
 
-  mountTopbar(document.getElementById('auth-area'));
+  mountTopbar(document.getElementById('auth-area'), document.getElementById('refresh-slot'));
   mountInputs(document.getElementById('pane-inputs'));
   mountCalendar(document.getElementById('pane-calendar'));
   mountPlan(document.getElementById('pane-plan'));
@@ -70,8 +70,15 @@ async function init() {
 
   api.ping(); // wake the server in the background
 
+  // Moving around the calendar (or logging in/out) may need a new window of Google events.
+  // This only schedules a background fetch when the view nears the edge of what is loaded;
+  // it never delays the click itself.
+  subscribe(['view', 'auth'], ensureEventsForView);
+
   const { token, loginError } = consumeHash();
-  if (token) setToken(token);
+  if (token && !setToken(token)) {
+    notify('storage', 'warn', "Your browser wouldn't save your login, so you'll need to log in again after reloading this page.");
+  }
   if (loginError) notify('login-error', 'error', loginErrorMessage(loginError));
 
   if (getToken()) await enterUserMode({ afterLogin: !!token });

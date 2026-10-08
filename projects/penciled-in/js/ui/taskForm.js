@@ -43,7 +43,12 @@ export function openTaskForm(task = null) {
     if (!name || name.length > 200) return fail('Give the task a name (up to 200 characters).');
     const dueMs = fromInputDateTime(due.value, tz);
     if (Number.isNaN(dueMs)) return fail('Choose a due date and time.');
-    const duration = (parseInt(hours.value || '0', 10) || 0) * 60 + (parseInt(mins.value || '0', 10) || 0);
+    const hrs = parseInt(hours.value || '0', 10);
+    const extra = parseInt(mins.value || '0', 10);
+    if (Number.isNaN(hrs) || Number.isNaN(extra) || hrs < 0 || extra < 0 || extra > 59) {
+      return fail('Enter hours as a whole number and minutes from 0 to 59.');
+    }
+    const duration = hrs * 60 + extra;
     if (duration < 1 || duration > 10080) return fail('Estimated time must be between 1 minute and 7 days.');
 
     const next = {

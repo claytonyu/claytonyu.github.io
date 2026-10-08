@@ -133,7 +133,17 @@ export function expandBlock(block, tz, fromMs, toMs) {
   return out;
 }
 
-export function describeRule(text) {
+// The last day (day number) a rule can repeat on, whichever way UNTIL was written, or null.
+// A UTC date-time is read as a calendar date in `tz`.
+export function untilDay(rule, tz) {
+  const u = rule && rule.until;
+  if (!u) return null;
+  if (u.kind === 'day') return u.day;
+  if (u.kind === 'wall') return Math.floor(u.min / DAY_MIN);
+  return tz ? Math.floor(utcToWall(u.ms, tz) / DAY_MIN) : Math.floor(u.ms / 86400000);
+}
+
+export function describeRule(text, tz) {
   const rule = parseRule(text);
   if (!rule) return 'Repeats';
   const unit = rule.freq === 'DAILY' ? 'day' : 'week';
@@ -142,8 +152,8 @@ export function describeRule(text) {
     const days = [...new Set(rule.byday)].sort((a, b) => a - b).map((i) => WEEKDAY_LABELS[i]);
     out += ` on ${days.join(', ')}`;
   }
-  if (rule.until && rule.until.kind === 'day') out += `, until ${fmtMonthDay(rule.until.day)}`;
-  else if (rule.until) out += ', until a set date';
+  const last = untilDay(rule, tz);
+  if (last !== null) out += `, until ${fmtMonthDay(last)}`;
   if (rule.count !== null) out += `, ${rule.count} time${rule.count === 1 ? '' : 's'}`;
   return out;
 }

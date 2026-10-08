@@ -108,26 +108,66 @@ function schedule() {
   timer = setTimeout(() => flush(), SYNC_DEBOUNCE_MS);
 }
 
+// Every edit goes into `pending` and into any active recorder (see trackEdits).
+const recorders = new Set();
+function record(apply) {
+  apply(pending);
+  for (const r of recorders) apply(r);
+  schedule();
+}
+
 export const queue = {
   settings(patch) {
-    Object.assign(pending.settings, patch);
-    schedule();
+    record((p) => Object.assign(p.settings, patch));
   },
   calendar(id, patch) {
-    pending.calendars[id] = { ...pending.calendars[id], ...patch, id };
-    schedule();
+    record((p) => {
+      p.calendars[id] = { ...p.calendars[id], ...patch, id };
+    });
   },
   upsert(collection, item) {
-    pending[collection].upsert[item.id] = item;
-    delete pending[collection].delete[item.id];
-    schedule();
+    record((p) => {
+      p[collection].upsert[item.id] = item;
+      delete p[collection].delete[item.id];
+    });
   },
   remove(collection, id) {
-    delete pending[collection].upsert[id];
-    pending[collection].delete[id] = true;
-    schedule();
+    record((p) => {
+      delete p[collection].upsert[id];
+      p[collection].delete[id] = true;
+    });
   },
 };
+
+// Replace items in a server list with the edits made while the request was in flight.
+function overlayList(list, { upsert, delete: del }) {
+  const next = (Array.isArray(list) ? list : []).filter((x) => !del[x.id]).map((x) => upsert[x.id] || x);
+  const have = new Set(next.map((x) => x.id));
+  for (const item of Object.values(upsert)) if (!have.has(item.id)) next.push(item);
+  return next;
+}
+
+// Start remembering every edit made from now on. A GET /state response can be older than
+// edits the user made while it was loading, so overlay() replays those edits onto it.
+// Always call stop() when the request ends.
+export function trackEdits() {
+  const edits = emptyPending();
+  recorders.add(edits);
+  return {
+    overlay(data) {
+      if (isEmpty(edits)) return data;
+      const out = { ...data, settings: { ...data.settings, ...edits.settings } };
+      out.calendars = (Array.isArray(data.calendars) ? data.calendars : []).map((c) =>
+        edits.calendars[c.id] ? { ...c, ...edits.calendars[c.id] } : c,
+      );
+      for (const c of COLLECTIONS) out[c] = overlayList(data[c], edits[c]);
+      return out;
+    },
+    stop() {
+      recorders.delete(edits);
+    },
+  };
+}
 
 function buildBody(p) {
   const body = {};
@@ -183,7 +223,8 @@ async function send(keepalive) {
   inFlightBatch = batch;
   setStatus('saving');
   const body = buildBody(batch);
-  const useKeepalive = keepalive && JSON.stringify(body).length < KEEPALIVE_MAX_BYTES;
+  // The browser limit is in bytes, and non-ASCII characters take more than one.
+  const useKeepalive = keepalive && new TextEncoder().encode(JSON.stringify(body)).length < KEEPALIVE_MAX_BYTES;
   try {
     const res = await api.patchSync(body, { keepalive: useKeepalive });
     inFlightBatch = null;
@@ -198,8 +239,10 @@ async function send(keepalive) {
       // Session is gone; the 401 handler resets us and switches to guest mode.
       return { ok: false, err };
     }
-    if (err instanceof api.ApiError && err.status === 422) {
-      const dropped = dropIds(batch, err.ids);
+    // The server refused this batch (422, or another 4xx such as 413 that retrying can't fix).
+    // Never keep it: it would fail the same way on every later save.
+    if (err instanceof api.ApiError && err.status >= 400 && err.status < 500 && err.status !== 429) {
+      const dropped = err.status === 422 ? dropIds(batch, err.ids) : 0;
       if (dropped > 0) {
         pending = mergePending(batch, pending);
         persist();
@@ -213,24 +256,22 @@ async function send(keepalive) {
         handlers.onRejected(err, { discarded: true });
         setStatus(isEmpty(pending) ? 'idle' : 'pending');
       }
-      return { ok: false, err };
+      return { ok: false, rejected: true, err };
     }
-    // Network trouble, 5xx, 429, or other 4xx we can't act on: keep the batch and retry.
+    // Network trouble, 5xx or 429: keep the batch and retry with backoff.
     pending = mergePending(batch, pending);
     persist();
     setStatus('error');
-    const fatal4xx = err instanceof api.ApiError && err.status >= 400 && err.status < 500 && err.status !== 429;
-    if (!fatal4xx) {
-      clearTimeout(retryTimer);
-      const wait = err.retryAfter != null ? err.retryAfter * 1000 : Math.min(3000 * 2 ** retryStep, 60000);
-      retryStep++;
-      retryTimer = setTimeout(() => flush(), wait);
-    }
+    clearTimeout(retryTimer);
+    const wait = err.retryAfter != null ? err.retryAfter * 1000 : Math.min(3000 * 2 ** retryStep, 60000);
+    retryStep++;
+    retryTimer = setTimeout(() => flush(), wait);
     return { ok: false, err };
   }
 }
 
-// Send everything pending right now. Never throws; check `.ok`.
+// Send everything pending right now. Never throws; check `.ok`. `.rejected` means the server
+// refused the batch for good (it was dropped), so there is nothing left to retry.
 export async function flush({ keepalive = false } = {}) {
   while (inFlight) await inFlight.catch(() => {});
   if (isEmpty(pending)) return { ok: true };

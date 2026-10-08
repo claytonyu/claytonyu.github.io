@@ -13,17 +13,24 @@ export function openEventDialog(ev) {
 
   const actions = [];
   if (active.length) {
-    actions.push(
+    // A series dismissal covers every instance, so restoring it is a separate, clearly
+    // labelled choice. It must not be bundled into restoring just this event.
+    const single = active.filter((d) => d.scope === 'occurrence');
+    const series = active.filter((d) => d.scope === 'series');
+    const restoreButton = (text, dismissals, primary) =>
       h('button', {
-        class: 'btn btn-primary',
+        class: primary ? 'btn btn-primary' : 'btn',
         type: 'button',
-        text: 'Restore (block this time again)',
+        text,
         onclick: () => {
-          restoreDismissals(active.map((d) => d.id));
+          restoreDismissals(dismissals.map((d) => d.id));
           closeModal();
         },
-      }),
-    );
+      });
+    if (single.length) actions.push(restoreButton('Stop ignoring this event (block this time again)', single, true));
+    if (series.length) {
+      actions.push(restoreButton('Stop ignoring every event in this series', series, !single.length));
+    }
   } else {
     actions.push(
       h('button', {

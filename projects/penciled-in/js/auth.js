@@ -1,21 +1,30 @@
 // Session token handling (bearer token in localStorage, per SPEC.md).
 import { BACKEND_URL, STORAGE } from './config.js';
 
+// Kept in memory too, so a browser that blocks localStorage still gets a working session
+// until the page is reloaded.
+let memoryToken = null;
+
 export function getToken() {
+  if (memoryToken) return memoryToken;
   try {
     return localStorage.getItem(STORAGE.token);
   } catch {
     return null;
   }
 }
+// Returns false when the token could not be saved for the next visit.
 export function setToken(token) {
+  memoryToken = token;
   try {
     localStorage.setItem(STORAGE.token, token);
+    return true;
   } catch {
-    /* storage unavailable: the session just won't survive a reload */
+    return false;
   }
 }
 export function clearToken() {
+  memoryToken = null;
   try {
     localStorage.removeItem(STORAGE.token);
   } catch {

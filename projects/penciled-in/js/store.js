@@ -26,7 +26,7 @@ export function browserTimeZone() {
 }
 
 export const defaultSettings = () => ({
-  padding_min: 15,
+  padding_min: 0,
   work_start: '08:00',
   work_end: '22:00',
   spread_mode: 'even',
@@ -44,10 +44,13 @@ export const state = {
   chunks: [],
   dismissed: [],
   events: [],
+  eventWindow: null, // days covered by `events`: { from, to } (day numbers, `to` exclusive)
+  eventsFailed: false, // the last events fetch failed; no automatic retries until Refresh
   googleError: null,
   result: null, // last Generate: { unschedulable, warnings, placed, placedMin, at }
   inputsChanged: false, // inputs edited since the last Generate
-  busy: { generating: false, refreshing: false, waking: false },
+  inputRevision: 0, // counts input edits, so Generate can tell if any happened while it ran
+  busy: { generating: false, refreshing: false, waking: false, events: false },
   syncStatus: 'idle',
   notices: [],
   view: { mode: 'week', focusDay: todayDay(browserTimeZone()) },
@@ -160,6 +163,8 @@ export function enterGuestState() {
   state.calendars = [];
   state.dismissed = [];
   state.events = [];
+  state.eventWindow = null;
+  state.eventsFailed = false;
   state.googleError = null;
   state.result = null;
   state.inputsChanged = false;
@@ -177,6 +182,8 @@ export function beginUserLoading() {
   state.calendars = [];
   state.dismissed = [];
   state.events = [];
+  state.eventWindow = null;
+  state.eventsFailed = false;
   state.googleError = null;
   state.result = null;
   state.inputsChanged = false;
@@ -201,7 +208,10 @@ export function applyServerState(d) {
 }
 
 function afterChange({ input = true } = {}) {
-  if (input) state.inputsChanged = true;
+  if (input) {
+    state.inputsChanged = true;
+    state.inputRevision++;
+  }
   if (state.mode === 'guest') saveGuest();
   emit('data', 'status');
 }
@@ -337,6 +347,18 @@ export function viewRange() {
   const n = state.view.mode === 'week' ? 7 : 1;
   const first = n === 7 ? state.view.focusDay - weekdayOfDay(state.view.focusDay) : state.view.focusDay;
   return { first, n };
+}
+// The middle day of what is on screen. Event windows are centered here.
+export function viewCenterDay() {
+  const { first, n } = viewRange();
+  return first + Math.floor(n / 2);
+}
+// Does the loaded event window include the visible days, plus `margin` days either side?
+export function eventsCoverView(margin = 0) {
+  const w = state.eventWindow;
+  if (!w) return false;
+  const { first, n } = viewRange();
+  return first - margin >= w.from && first + n + margin <= w.to;
 }
 export function setFocusDay(day) {
   state.view.focusDay = day;

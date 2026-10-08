@@ -43,7 +43,7 @@ function requestFinished() {
   }
 }
 
-async function request(method, path, { body, keepalive = false, silent401 = false } = {}) {
+async function request(method, path, { body, keepalive = false, silent401 = false, quiet = false } = {}) {
   const headers = { Accept: 'application/json' };
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -51,8 +51,10 @@ async function request(method, path, { body, keepalive = false, silent401 = fals
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  // keepalive requests are fire-and-forget on page hide; don't show the slow banner for them.
-  if (!keepalive) requestStarted();
+  // keepalive requests are fire-and-forget on page hide, and `quiet` ones are background
+  // fetches; neither should trigger the "waking up the server" banner.
+  const tracked = !keepalive && !quiet;
+  if (tracked) requestStarted();
   let res;
   try {
     res = await fetch(BACKEND_URL + path, {
@@ -73,7 +75,7 @@ async function request(method, path, { body, keepalive = false, silent401 = fals
     );
   } finally {
     clearTimeout(timeout);
-    if (!keepalive) requestFinished();
+    if (tracked) requestFinished();
   }
 
   let data = null;
@@ -124,7 +126,9 @@ export function ping() {
   fetch(`${BACKEND_URL}/`, { cache: 'no-store' }).catch(() => {});
 }
 
-export const getState = (syncGoogle = true) => request('GET', `/state?sync_google=${syncGoogle ? 'true' : 'false'}`);
+// offsetDays picks which 60 days of Google events come back: centered on today + offsetDays.
+export const getState = (syncGoogle = true, offsetDays = 0, opts = {}) =>
+  request('GET', `/state?sync_google=${syncGoogle ? 'true' : 'false'}&offset_days=${Math.trunc(offsetDays)}`, opts);
 export const patchSync = (body, opts) => request('PATCH', '/sync', { body, ...opts });
 export const postSchedule = (body) => request('POST', '/schedule', { body });
 export const logout = () => request('DELETE', '/auth/session', { silent401: true });
