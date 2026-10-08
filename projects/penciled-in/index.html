@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--
+    Strict CSP (see FRONTEND_GUIDE.md). connect-src lists both backends:
+    the deployed Render service and a local dev server on port 8000.
+    No inline scripts or styles, no CDNs.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://one5113-project2-penciled-in.onrender.com http://localhost:8000; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>Penciled In</title>
+  <meta name="description" content="Penciled In turns your task list into a realistic schedule that works around the time you are unavailable.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%8F%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body data-pane="calendar">
+  <a class="skip-link" href="#pane-calendar">Skip to calendar</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <h1 class="brand-title">Penciled In</h1>
+      <p class="brand-tag">Turn your task list into a schedule that works around your life.</p>
+    </div>
+    <div class="auth-area" id="auth-area"></div>
+  </header>
+
+  <main class="app">
+    <aside class="pane pane-inputs" id="pane-inputs" aria-label="Tasks and unavailable time"></aside>
+    <section class="pane pane-calendar" id="pane-calendar" aria-label="Schedule calendar" tabindex="-1"></section>
+    <aside class="pane pane-plan" id="pane-plan" aria-label="Generate and results"></aside>
+  </main>
+
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Sections"></nav>
+
+  <dialog id="modal" class="modal"></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p class="noscript">Penciled In needs JavaScript to run.</p></noscript>
+</body>
+</html>
