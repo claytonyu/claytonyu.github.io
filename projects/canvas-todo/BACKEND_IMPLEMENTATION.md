@@ -6,7 +6,7 @@ How the backend in this repo implements [SPEC.md](SPEC.md), and everything the f
 
 A Flask JSON API for a to-do app that can import Canvas assignments as tasks.
 
-- Stack: Flask, Flask-SQLAlchemy + psycopg 3, Render Postgres, gunicorn on Render.
+- Stack: Flask, Flask-SQLAlchemy + psycopg 3, Neon Postgres, gunicorn on Render.
 - Base URL: the Render service URL, e.g. `https://<service>.onrender.com`. All paths below are relative to it.
 - Users sign in with a Canvas personal access token (PAT) once, then use a session token.
 
@@ -189,7 +189,7 @@ This is `403` instead of `401` on purpose: `401` means "log in again", while `ca
 
 | Env var | Purpose |
 |---|---|
-| `DATABASE_URL` | Postgres URL. Use the Internal URL on Render and the External URL locally. `postgresql://` is rewritten to `postgresql+psycopg://` automatically. |
+| `DATABASE_URL` | Neon Postgres connection string (includes `sslmode=require`). The same URL works on Render and locally. `postgresql://` is rewritten to `postgresql+psycopg://` automatically. |
 | `ENCRYPTION_KEY` | Fernet key. Changing it makes stored PATs unreadable, so users get `canvas_token_required` and have to resubmit. |
 | `CANVAS_BASE_URL` | e.g. `https://canvas.cmu.edu` |
 | `FRONTEND_URL` | Scheme and host only, e.g. `https://<username>.github.io`. |
@@ -215,7 +215,7 @@ This is `403` instead of `401` on purpose: `401` means "log in again", while `ca
 ## 11. Known limitations
 
 - **Logging back in needs a PAT.** A PAT is the only login credential, so after logging out or after a session expires (7 days) the user must paste a PAT again. That can be the same one or a new one, and their data is still restored. The stored PAT is only used while the user has a valid session.
-- Free Render Postgres expires 30 days after creation, with a 14-day grace period.
+- Free Neon compute scales to zero after a few minutes idle, so the first query after a pause is slower. Free Render web services have the same kind of cold start (below).
 - Free web services have cold starts; see [section 6](#6-frontend-flows).
 - Expired session rows are never cleaned up. They're rejected but stay in the database.
 - Check CMU's Canvas policy on sharing PATs with third-party apps before real users sign up.

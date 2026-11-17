@@ -6,12 +6,11 @@ A to-do list web app should have users sign in, manage their own tasks, and sync
 ## Architecture
 - Frontend: Web-app. (separately hosted on GitHub Pages, calls the backend API). Do not work on this part, we are only working on the backend here.
 - Backend: Python 3.14 w/ Flask API, deployed on Render with gunicorn.
-- Database: Render Postgres, set up through the Render web dashboard.
-  - Setup: Dashboard → New → Postgres. Free plan, **same region as the web service**.
-  - Copy the database's **Internal Database URL** into the web service's Environment tab as `DATABASE_URL`. The internal URL only works from inside Render, which is what we want.
-  - Use the **External Database URL** only for local development or for inspecting data with `psql` or a GUI client. Render's dashboard doesn't have a table browser.
+- Database: Neon Postgres, set up through the Neon web console (the backend stays on Render).
+  - Setup: create a Neon project, ideally in a region close to the Render web service.
+  - Copy the Neon **connection string** (it includes `sslmode=require`) into the web service's Environment tab as `DATABASE_URL`. The same string works for local development and for inspecting data with `psql` or Neon's built-in Tables and SQL Editor views.
   - Flask connects through SQLAlchemy (Flask-SQLAlchemy + `psycopg`). Tables get created at app startup with `db.create_all()`, since free web services have no shell or pre-deploy command for running migrations.
-  - Free Render Postgres expires 30 days after creation, with a 14-day grace period before deletion. Expect to recreate it, or upgrade, if the app has to last longer.
+  - The free Neon plan doesn't expire, but the compute scales to zero after a few minutes idle, so the first query after a pause adds a short delay.
 
 ## Coding Style
 You are a senior software architect. Strictly adhere to these principles:
@@ -101,7 +100,7 @@ This is very important. Make sure to check this after making any changes regardi
 ### 7. Deployment & Config
 - Hosting: frontend on GitHub Pages, backend on Render.
 - Environment variables (set in the Render dashboard):
-  - `DATABASE_URL`: Render Postgres internal URL
+  - `DATABASE_URL`: Neon Postgres connection string
   - `ENCRYPTION_KEY`: Fernet key for PATs. Losing or changing it makes stored PATs unreadable, so users would need to submit new ones.
   - `CANVAS_BASE_URL`: e.g. `https://canvas.cmu.edu`
   - `FRONTEND_URL`: e.g. `https://<username>.github.io`, used for CORS. The CORS origin is scheme + host only, with no path.

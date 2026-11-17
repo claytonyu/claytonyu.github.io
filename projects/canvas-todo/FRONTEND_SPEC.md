@@ -14,7 +14,7 @@ This app is a to-do app, allowing the user to create tasks with deadlines. One o
     ? "http://localhost:8080"
     : "https://one5113-hw4-backend.onrender.com";
   ```
-  Local testing (`python app.py`, port 8080 per BACKEND_IMPLEMENTATION.md section 9) hits a local backend/local Postgres; the deployed site always hits production. No manual swap to forget before pushing. All API calls read from this constant rather than hardcoding the URL per call site.
+  Local testing (`python app.py`, port 8080 per BACKEND_IMPLEMENTATION.md section 9) hits a local backend with its own local Postgres or a separate Neon branch; the deployed site always hits production. No manual swap to forget before pushing. All API calls read from this constant rather than hardcoding the URL per call site.
 
 ## Coding Style
 You are a senior software architect. Strictly adhere to these principles:
@@ -125,7 +125,7 @@ Aesthetic should be clean but is standalone from the rest of claytonyu.github.io
 
 ## Deployment & Config
 - File layout within `projects/canvas-todo/`: static HTML/CSS/JS files alongside the existing `SPEC.md`, `BACKEND_IMPLEMENTATION.md`, `FRONTEND_SPEC.md` — no separate build output since there's no build step.
-- Backend base URL switches automatically between local and production based on `location.hostname` (see Architecture above). Local dev needs the Flask backend running locally (`python app.py`, port 8080) with its own local `.env`/Postgres — local testing never touches the production database.
+- Backend base URL switches automatically between local and production based on `location.hostname` (see Architecture above). Local dev needs the Flask backend running locally (`python app.py`, port 8080) with its own local `.env` pointing at a local Postgres or a separate Neon branch, so local testing never touches the production database.
 - CORS is backend-enforced via `FRONTEND_URL`; the deployed origin (`https://<username>.github.io`) must exactly match what's configured on Render, or every request will fail at the browser level with no useful error from the backend's side. For local frontend testing, the local backend's `FRONTEND_URL` must likewise allow the local origin (e.g. `http://localhost:5500` or whatever serves the static files).
 
 ## Open Issues
